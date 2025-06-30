@@ -39,6 +39,7 @@ dependencies:
   flutter_bloc: ^9.1.1
   flutter_dotenv: ^5.2.1
   get_it: ^8.0.3
+  logger: ^2.6.0
 
 dev_dependencies:
   flutter_lints: ^5.0.0
@@ -57,6 +58,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
 assets:
   - .env
+  - assets/images/
+  - assets/images/logo/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
   # For details regarding adding assets from package dependencies, see
@@ -80,3 +83,7 @@ assets:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_assets:
+  assets_path: assets/
+  output_path: lib/core/utils/
+  filename: app_assets.dart
