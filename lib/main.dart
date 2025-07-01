@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:student_absence/core/utils/app_strings.dart';
 import 'package:student_absence/bloc_observer.dart';
+import 'package:student_absence/features/auth/login/presentation/login_welcome.dart';
 import 'package:student_absence/firebase_options.dart';
 import 'package:student_absence/features/splash/splash_screen.dart';
 import 'package:student_absence/features/auth/login/presentation/login_screen.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashView(),
+        '/loginWelcome': (context) => const LoginWelcomeScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
       },

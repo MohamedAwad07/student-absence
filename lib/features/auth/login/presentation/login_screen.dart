@@ -1,127 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:student_absence/core/utils/app_assets.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
+import 'package:student_absence/core/utils/app_strings.dart';
+import 'package:student_absence/features/auth/login/presentation/login_form.dart';
+import 'package:student_absence/features/auth/login/presentation/login_logo.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
+    return const Scaffold(
+      backgroundColor: AppColors.scaffoldBackground,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 48.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 32),
-              Center(
-                child: Image.asset(
-                  Assets.assetsImagesLogoLogoGold,
-                  width: 120,
-                  height: 120,
-                ),
+              SizedBox(height: 32),
+              LoginLogo(
+                iconColor: AppColors.primary,
+                iconPath: Assets.assetsImagesLogoLogoGold,
               ),
-              const SizedBox(height: 24),
-              const Text(
-                'تسجيل الدخول',
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'أدخل بياناتك لتسجيل الدخول',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              const SizedBox(height: 32),
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        labelText: 'البريد الإلكتروني',
-                        prefixIcon: Icon(Icons.email_outlined),
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'يرجى إدخال البريد الإلكتروني';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'كلمة المرور',
-                        prefixIcon: Icon(Icons.lock_outline),
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'يرجى إدخال كلمة المرور';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 32),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            // TODO: Implement login logic
-                          }
-                        },
-                        child: const Text(
-                          'تسجيل الدخول',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('ليس لديك حساب؟'),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/register');
-                          },
-                          child: const Text(
-                            'إنشاء حساب',
-                            style: TextStyle(color: AppColors.primary),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              SizedBox(height: 24),
+              LoginForm(),
+              SizedBox(height: 36),
+              BackToHomeButton(),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class RegisterPrompt extends StatelessWidget {
+  const RegisterPrompt({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(AppStrings.noAccount),
+        TextButton(
+          onPressed: () {
+            Navigator.pushNamed(context, '/register');
+          },
+          child: const Text(
+            AppStrings.createAccount,
+            style: TextStyle(color: AppColors.primary),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class BackToHomeButton extends StatelessWidget {
+  const BackToHomeButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/loginWelcome',
+          (Route<dynamic> route) => false,
+        );
+      },
+      child: const Text(
+        AppStrings.backToHome,
+        style: TextStyle(color: AppColors.primary, fontSize: 16),
       ),
     );
   }

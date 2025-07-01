@@ -98,7 +98,11 @@ class _SplashViewState extends State<SplashView> {
       });
       Future.delayed(const Duration(milliseconds: 800), () {
         if (!mounted) return;
-        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/loginWelcome',
+          (route) => false,
+        );
       });
     });
   }
