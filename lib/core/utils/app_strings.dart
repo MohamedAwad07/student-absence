@@ -1,4 +1,7 @@
 class AppStrings {
+  static const String appName = 'نظام إدارة أعذار الطلاب';
+  static const String copyright = 'جميع الحقوق محفوظة © 2025';
+
   static const String connectionTimeout = 'انتهت مهلة الاتصال';
   static const String badCertification = 'شهادة غير صالحة';
   static const String requestCancelled = 'تم إلغاء الطلب';
