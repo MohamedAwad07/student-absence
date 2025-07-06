@@ -16,7 +16,7 @@ class StudentHomeAppBar extends StatelessWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const SizedBox(width: 16),
+          const SizedBox(width: 24),
           Row(
             children: [
               Image.asset(
@@ -36,6 +36,7 @@ class StudentHomeAppBar extends StatelessWidget {
             ],
           ),
           IconButton(
+            padding: EdgeInsets.zero,
             icon: const Icon(
               Icons.account_circle,
               color: Colors.white,
