@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 
@@ -84,7 +86,7 @@ class StudentHomePage extends StatelessWidget {
                     // Settings Button
                     Center(
                       child: TextButton.icon(
-                        onPressed: () {},
+                        onPressed: () => context.go(AppRoutes.studentProfilePage),
                         icon: const Icon(
                           Icons.settings,
                           color: Color(0xFF225A2A),
