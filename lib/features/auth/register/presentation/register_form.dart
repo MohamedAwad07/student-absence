@@ -51,7 +51,7 @@ class RegisterFormState extends State<RegisterForm> {
             AppStrings.register,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 8),
           CustomTextField(
             controller: nameController,
             label: AppStrings.fullName,
@@ -123,7 +123,6 @@ class RegisterFormState extends State<RegisterForm> {
               }
             },
           ),
-          const SizedBox(height: 16),
           TextButton(
             onPressed: () {
               context.go('/login/${widget.role}');

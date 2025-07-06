@@ -7,80 +7,75 @@ class StudentTrackExcuses extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColors.scaffoldBackground,
-        body: CustomScrollView(
-          slivers: [
-            StudentHomeAppBar(profileOnPressed: () {}),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 16.0,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Section Title
-                    const SizedBox(height: 8),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 8.0,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'متابعة الأعذار',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'يمكنك متابعة حالة الأعذار الخاصة بك',
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 13,
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                        ],
-                      ),
+    return Scaffold(
+      backgroundColor: AppColors.scaffoldBackground,
+      body: CustomScrollView(
+        slivers: [
+          StudentHomeAppBar(profileOnPressed: () {}),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 16.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Section Title
+                  const SizedBox(height: 8),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
                     ),
-                    // Excuses List
-                    _ExcuseTrackList(),
-                    const SizedBox(height: 32),
-                    // Submit New Excuse Button
-                    Center(
-                      child: SizedBox(
-                        width: 220,
-                        height: 40,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'متابعة الأعذار',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: AppColors.primary,
                           ),
-                          onPressed: () {},
-                          child: const Text(
-                            'تقديم عذر جديد',
-                            style: TextStyle(fontSize: 15, color: Colors.white),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'يمكنك متابعة حالة الأعذار الخاصة بك',
+                          style: TextStyle(color: Colors.black54, fontSize: 13),
+                        ),
+                        SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                  // Excuses List
+                  _ExcuseTrackList(),
+                  const SizedBox(height: 32),
+                  // Submit New Excuse Button
+                  Center(
+                    child: SizedBox(
+                      width: 220,
+                      height: 40,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
                           ),
+                        ),
+                        onPressed: () {},
+                        child: const Text(
+                          'تقديم عذر جديد',
+                          style: TextStyle(fontSize: 15, color: Colors.white),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

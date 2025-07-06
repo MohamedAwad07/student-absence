@@ -22,7 +22,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Column(
             children: [
-              const SizedBox(height: 24),
+              // const SizedBox(height: 24),
               const _HeaderRow(),
               const SizedBox(height: 24),
               // Form container

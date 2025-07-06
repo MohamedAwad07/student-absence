@@ -7,72 +7,67 @@ class StudentNotifications extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColors.scaffoldBackground,
-        body: CustomScrollView(
-          slivers: [
-            StudentHomeAppBar(profileOnPressed: () {}),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 0,
-                  vertical: 8.0,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Filter and Title Row
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            'مركز الإشعارات',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          Spacer(),
-                          Icon(
-                            Icons.filter_alt,
-                            color: AppColors.secondary,
-                            size: 28,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Notifications List
-                    _NotificationList(),
-                    const SizedBox(height: 24),
-                    // Show More Button
-                    Center(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.primary),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                        ),
-                        onPressed: () {},
-                        child: const Text(
-                          'عرض المزيد',
+    return Scaffold(
+      backgroundColor: AppColors.scaffoldBackground,
+      body: CustomScrollView(
+        slivers: [
+          StudentHomeAppBar(profileOnPressed: () {}),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Filter and Title Row
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          'مركز الإشعارات',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 17,
                             color: AppColors.primary,
                           ),
                         ),
+                        Spacer(),
+                        Icon(
+                          Icons.filter_alt,
+                          color: AppColors.secondary,
+                          size: 28,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Notifications List
+                  _NotificationList(),
+                  const SizedBox(height: 24),
+                  // Show More Button
+                  Center(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                      ),
+                      onPressed: () {},
+                      child: const Text(
+                        'عرض المزيد',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

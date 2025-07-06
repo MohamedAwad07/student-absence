@@ -9,39 +9,37 @@ class SupervisorHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColors.scaffoldBackground,
-        body: CustomScrollView(
-          slivers: [
-            StudentHomeAppBar(profileOnPressed: () {}),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    // Section Title
-                    const Text(
-                      'الأعذار المراجعة',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: AppColors.primary,
-                      ),
+    return Scaffold(
+      backgroundColor: AppColors.scaffoldBackground,
+      body: CustomScrollView(
+        slivers: [
+          StudentHomeAppBar(profileOnPressed: () {}),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  // Section Title
+                  const Text(
+                    'الأعذار المراجعة',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: AppColors.primary,
                     ),
-                    const SizedBox(height: 12),
-                    _ReviewedExcuseList(),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 12),
+                  _ReviewedExcuseList(),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

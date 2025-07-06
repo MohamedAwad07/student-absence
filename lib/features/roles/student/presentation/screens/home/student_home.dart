@@ -9,100 +9,98 @@ class StudentHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColors.scaffoldBackground,
-        body: CustomScrollView(
-          slivers: [
-            StudentHomeAppBar(profileOnPressed: () {}),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
-                ),
-                child: Column(
-                  children: [
-                    // Profile Section
-                    const Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 36,
-                          backgroundColor: Color(0xFFD4A63A),
-                          child: Icon(
-                            Icons.person,
-                            size: 48,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'أحمد محمد مهدي',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          'رقم الطالب: 445521',
-                          style: TextStyle(color: Colors.grey, fontSize: 14),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // Summary Cards
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _SummaryCard(
-                          count: 3,
-                          label: 'مقبولة',
-                          color: Color(0xFF4CAF50),
-                        ),
-                        _SummaryCard(
-                          count: 1,
-                          label: 'قيد المراجعة',
-                          color: Color(0xFFFFC107),
-                        ),
-                        _SummaryCard(
-                          count: 2,
-                          label: 'مرفوضة',
-                          color: Color(0xFFF44336),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-                    // Latest Excuses
-                    _SectionTitle(title: 'ملخص الأعذار', onPressed: () {}),
-                    const SizedBox(height: 8),
-                    _ExcuseList(),
-                    const SizedBox(height: 18),
-                    // Notifications
-                    _SectionTitle(title: 'الإشعارات', onPressed: () {}),
-                    const SizedBox(height: 8),
-                    _NotificationList(),
-                    const SizedBox(height: 24),
-                    // Settings Button
-                    Center(
-                      child: TextButton.icon(
-                        onPressed: () => context.go(AppRoutes.studentProfilePage),
-                        icon: const Icon(
-                          Icons.settings,
-                          color: Color(0xFF225A2A),
-                        ),
-                        label: const Text(
-                          'الإعدادات',
-                          style: TextStyle(color: Color(0xFF225A2A)),
+    return Scaffold(
+      backgroundColor: AppColors.scaffoldBackground,
+      body: CustomScrollView(
+        slivers: [
+          StudentHomeAppBar(profileOnPressed: () {}),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
+              child: Column(
+                children: [
+                  // Profile Section
+                  const Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 36,
+                        backgroundColor: Color(0xFFD4A63A),
+                        child: Icon(
+                          Icons.person,
+                          size: 48,
+                          color: Colors.white,
                         ),
                       ),
+                      SizedBox(height: 8),
+                      Text(
+                        'أحمد محمد مهدي',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        'رقم الطالب: 445521',
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Summary Cards
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _SummaryCard(
+                        count: 3,
+                        label: 'مقبولة',
+                        color: Color(0xFF4CAF50),
+                      ),
+                      _SummaryCard(
+                        count: 1,
+                        label: 'قيد المراجعة',
+                        color: Color(0xFFFFC107),
+                      ),
+                      _SummaryCard(
+                        count: 2,
+                        label: 'مرفوضة',
+                        color: Color(0xFFF44336),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  // Latest Excuses
+                  _SectionTitle(title: 'ملخص الأعذار', onPressed: () {}),
+                  const SizedBox(height: 8),
+                  _ExcuseList(),
+                  const SizedBox(height: 18),
+                  // Notifications
+                  _SectionTitle(title: 'الإشعارات', onPressed: () {}),
+                  const SizedBox(height: 8),
+                  _NotificationList(),
+                  const SizedBox(height: 24),
+                  // Settings Button
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () => context.go(AppRoutes.studentProfilePage),
+                      icon: const Icon(
+                        Icons.settings,
+                        color: Color(0xFF225A2A),
+                      ),
+                      label: const Text(
+                        'الإعدادات',
+                        style: TextStyle(color: Color(0xFF225A2A)),
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -18,7 +18,7 @@ class LoginWelcomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
               const LoginLogo(
                 iconColor: AppColors.white,
                 iconPath: Assets.assetsImagesLogoLogoGreen,
@@ -57,6 +57,7 @@ class LoginWelcomeScreen extends StatelessWidget {
                   children: [
                     Center(
                       child: Text(
+                        textAlign: TextAlign.center,
                         AppStrings.systemDescription,
                         style: TextStyle(fontSize: 14),
                       ),
@@ -116,7 +117,7 @@ class InfoItem extends StatelessWidget {
     return Row(
       children: [
         const SizedBox(width: 64),
-        Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
+        Expanded(child: Text(text, style: const TextStyle(fontSize: 12))),
         const SizedBox(width: 8),
         const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
         const SizedBox(width: 64),

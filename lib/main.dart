@@ -9,12 +9,20 @@ import 'package:student_absence/core/utils/app_extension.dart';
 import 'package:student_absence/core/utils/app_strings.dart';
 import 'package:student_absence/bloc_observer.dart';
 import 'package:student_absence/firebase_options.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   Bloc.observer = Observe();
   await dotenv.load(fileName: ".env");
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ),
+  );
   runApp(const MyApp());
 }
 

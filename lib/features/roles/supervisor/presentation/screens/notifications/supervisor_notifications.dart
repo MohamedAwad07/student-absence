@@ -9,79 +9,77 @@ class SupervisorNotifications extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColors.scaffoldBackground,
-        body: CustomScrollView(
-          slivers: [
-            StudentHomeAppBar(profileOnPressed: () {}),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 16.0, top: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header Row: Section Title and Filter Icon
-                    const Padding(
-                      padding: EdgeInsets.only(
-                        right: 16,
-                        left: 8,
-                        bottom: 4,
-                        top: 8,
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            'مركز الإشعارات',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          Spacer(),
-                          Icon(
-                            Icons.filter_alt,
-                            color: AppColors.secondary,
-                            size: 28,
-                          ),
-                        ],
-                      ),
+    return Scaffold(
+      backgroundColor: AppColors.scaffoldBackground,
+      body: CustomScrollView(
+        slivers: [
+          StudentHomeAppBar(profileOnPressed: () {}),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16.0, top: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header Row: Section Title and Filter Icon
+                  const Padding(
+                    padding: EdgeInsets.only(
+                      right: 16,
+                      left: 8,
+                      bottom: 4,
+                      top: 8,
                     ),
-                    const SizedBox(height: 12),
-                    // Notifications List
-                    _SupervisorNotificationList(),
-                    const SizedBox(height: 32),
-                    Center(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.primary),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                            vertical: 8,
-                          ),
-                        ),
-                        onPressed: () {
-                          context.go(AppRoutes.supervisorHome);
-                        },
-                        child: const Text(
-                          'العودة للوحة التحكم',
+                    child: Row(
+                      children: [
+                        Text(
+                          'مركز الإشعارات',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                             color: AppColors.primary,
                           ),
                         ),
+                        Spacer(),
+                        Icon(
+                          Icons.filter_alt,
+                          color: AppColors.secondary,
+                          size: 28,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Notifications List
+                  _SupervisorNotificationList(),
+                  const SizedBox(height: 32),
+                  Center(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 8,
+                        ),
+                      ),
+                      onPressed: () {
+                        context.go(AppRoutes.supervisorHome);
+                      },
+                      child: const Text(
+                        'العودة للوحة التحكم',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

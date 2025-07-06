@@ -24,30 +24,31 @@ class _SupervisorBottomNavBarState extends State<SupervisorBottomNavBar> {
         bottomNavigationBar: Directionality(
           textDirection: TextDirection.ltr,
           child: BottomNavigationBar(
+            backgroundColor: AppColors.primary,
             type: BottomNavigationBarType.fixed,
             currentIndex: selectedIndex,
             onTap: (index) => changeTab(index),
-            selectedItemColor: AppColors.primary,
-            unselectedItemColor: AppColors.secondary,
+            selectedItemColor: AppColors.secondary,
+            unselectedItemColor: AppColors.white,
             showUnselectedLabels: false,
-            showSelectedLabels: false,
-            iconSize: 32.0,
+            showSelectedLabels: true,
+            iconSize: 26.0,
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined),
-                label: '',
+                label: 'الرئيسية',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.file_open_outlined),
-                label: '',
+                label: 'الأعذار',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.notification_important_outlined),
-                label: '',
+                label: 'الأشعارات',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person_2_outlined),
-                label: '',
+                label: 'حسابي',
               ),
             ],
           ),

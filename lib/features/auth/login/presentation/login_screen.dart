@@ -22,18 +22,17 @@ class LoginScreen extends StatelessWidget {
       backgroundColor: AppColors.scaffoldBackground,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 48.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 32),
+              const SizedBox(height: 36),
               const LoginLogo(
                 iconColor: AppColors.primary,
                 iconPath: Assets.assetsImagesLogoLogoGold,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               LoginForm(role: role),
-              const SizedBox(height: 36),
               RegisterAccountText(role: role),
               const BackToHomeButton(),
             ],
@@ -50,20 +49,22 @@ class RegisterAccountText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text(AppStrings.noAccount),
-        TextButton(
-          onPressed: () {
-            context.push('/register?role=$role');
-          },
-          child: const Text(
-            AppStrings.createAccount,
-            style: TextStyle(color: AppColors.primary),
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(AppStrings.noAccount),
+          TextButton(
+            onPressed: () {
+              context.push('/register?role=$role');
+            },
+            child: const Text(
+              AppStrings.createAccount,
+              style: TextStyle(color: AppColors.primary),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -73,13 +74,15 @@ class BackToHomeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        context.go(AppRoutes.loginWelcome);
-      },
-      child: const Text(
-        AppStrings.backToHome,
-        style: TextStyle(color: AppColors.primary, fontSize: 16),
+    return Center(
+      child: TextButton(
+        onPressed: () {
+          context.go(AppRoutes.loginWelcome);
+        },
+        child: const Text(
+          AppStrings.backToHome,
+          style: TextStyle(color: AppColors.primary, fontSize: 16),
+        ),
       ),
     );
   }
