@@ -24,7 +24,7 @@ class StudentHomeAppBar extends StatelessWidget {
                 width: 24,
                 height: 24,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               const Text(
                 AppStrings.appName,
                 style: TextStyle(
@@ -40,7 +40,7 @@ class StudentHomeAppBar extends StatelessWidget {
             icon: const Icon(
               Icons.account_circle,
               color: Colors.white,
-              size: 32,
+              size: 38,
             ),
             onPressed: profileOnPressed,
           ),
