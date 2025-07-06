@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:student_absence/core/components/custom_text_field.dart';
+import 'package:go_router/go_router.dart';
+import 'package:student_absence/core/widgets/custom_text_field.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/utils/app_constants.dart';
 import 'package:student_absence/core/utils/app_strings.dart';
-import 'package:student_absence/features/auth/login/presentation/login_screen.dart';
 
 import '../../custom_button.dart';
 
 class RegisterForm extends StatefulWidget {
-  const RegisterForm({super.key});
+  final String role;
+  const RegisterForm({super.key, required this.role});
 
   @override
   State<RegisterForm> createState() => RegisterFormState();
@@ -125,11 +126,7 @@ class RegisterFormState extends State<RegisterForm> {
           const SizedBox(height: 16),
           TextButton(
             onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-                (Route<dynamic> route) => false,
-              );
+              context.go('/login/${widget.role}');
             },
             child: const Text(
               AppStrings.alreadyHaveAnAccount,

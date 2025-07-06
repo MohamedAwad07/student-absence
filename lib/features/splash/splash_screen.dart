@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/utils/app_assets.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
+import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:student_absence/core/utils/app_strings.dart';
 
 class SplashView extends StatefulWidget {
@@ -98,11 +100,7 @@ class _SplashViewState extends State<SplashView> {
       });
       Future.delayed(const Duration(milliseconds: 800), () {
         if (!mounted) return;
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/loginWelcome',
-          (route) => false,
-        );
+        context.go(AppRoutes.loginWelcome);
       });
     });
   }

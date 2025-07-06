@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:student_absence/core/components/custom_text_field.dart';
+import 'package:go_router/go_router.dart';
+import 'package:student_absence/core/routing/app_routes.dart';
+import 'package:student_absence/core/widgets/custom_text_field.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/utils/app_strings.dart';
 import 'package:student_absence/features/auth/custom_button.dart';
-import 'package:student_absence/features/auth/login/presentation/login_screen.dart';
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+  final String role;
+  const LoginForm({super.key, required this.role});
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -82,7 +84,21 @@ class _LoginFormState extends State<LoginForm> {
                           ),
                         );
                       } else {
-                        // Navigator.pushNamed(context, '/home');
+                        String homeRoute;
+                        switch (widget.role) {
+                          case 'student':
+                            homeRoute = AppRoutes.studentHome;
+                            break;
+                          case 'supervisor':
+                            homeRoute = AppRoutes.supervisorHome;
+                            break;
+                          case 'manager':
+                            homeRoute = AppRoutes.managerHome;
+                            break;
+                          default:
+                            homeRoute = AppRoutes.studentHome;
+                        }
+                        context.go(homeRoute);
                       }
                     }
                   },
@@ -106,7 +122,6 @@ class _LoginFormState extends State<LoginForm> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const RegisterPrompt(),
               ],
             ),
           ),

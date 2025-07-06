@@ -1,32 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/utils/app_assets.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
+import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:student_absence/core/utils/app_strings.dart';
 import 'package:student_absence/features/auth/login/presentation/login_form.dart';
 import 'package:student_absence/features/auth/login/presentation/login_logo.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  final String role;
+  const LoginScreen({super.key, required this.role});
+
+  static LoginScreen fromGoRouterState(GoRouterState state) {
+    final role = state.pathParameters['role'] ?? 'student';
+    return LoginScreen(role: role);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 48.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 48.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 32),
-              LoginLogo(
+              const SizedBox(height: 32),
+              const LoginLogo(
                 iconColor: AppColors.primary,
                 iconPath: Assets.assetsImagesLogoLogoGold,
               ),
-              SizedBox(height: 24),
-              LoginForm(),
-              SizedBox(height: 36),
-              BackToHomeButton(),
+              const SizedBox(height: 24),
+              LoginForm(role: role),
+              const SizedBox(height: 36),
+              RegisterAccountText(role: role),
+              const BackToHomeButton(),
             ],
           ),
         ),
@@ -35,8 +44,9 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-class RegisterPrompt extends StatelessWidget {
-  const RegisterPrompt({super.key});
+class RegisterAccountText extends StatelessWidget {
+  final String role;
+  const RegisterAccountText({super.key, required this.role});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +56,7 @@ class RegisterPrompt extends StatelessWidget {
         const Text(AppStrings.noAccount),
         TextButton(
           onPressed: () {
-            Navigator.pushNamed(context, '/register');
+            context.push('/register?role=$role');
           },
           child: const Text(
             AppStrings.createAccount,
@@ -65,11 +75,7 @@ class BackToHomeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: () {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/loginWelcome',
-          (Route<dynamic> route) => false,
-        );
+        context.go(AppRoutes.loginWelcome);
       },
       child: const Text(
         AppStrings.backToHome,

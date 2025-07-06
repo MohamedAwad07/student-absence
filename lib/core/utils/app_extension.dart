@@ -49,13 +49,13 @@ extension SizeExtension on BuildContext {
 
 extension WidthExtension on BuildContext {
   double get width {
-    return MediaQuery.of(this).size.width;
+    return MediaQuery.sizeOf(this).width;
   }
 }
 
 extension HeightExtension on BuildContext {
   double get height {
-    return MediaQuery.of(this).size.height;
+    return MediaQuery.sizeOf(this).height;
   }
 }
 

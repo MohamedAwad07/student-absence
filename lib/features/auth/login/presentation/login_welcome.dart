@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/utils/app_assets.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/features/auth/login/presentation/login_logo.dart';
@@ -75,7 +76,7 @@ class LoginWelcomeScreen extends StatelessWidget {
                 backgroundColor: AppColors.primary,
                 textColor: Colors.white,
                 onPressed: () {
-                  Navigator.pushNamed(context, '/login');
+                  context.go('/login/student');
                 },
               ),
               const SizedBox(height: 12),
@@ -84,7 +85,7 @@ class LoginWelcomeScreen extends StatelessWidget {
                 backgroundColor: AppColors.secondary,
                 textColor: Colors.black87,
                 onPressed: () {
-                  Navigator.pushNamed(context, '/login');
+                  context.go('/login/supervisor');
                 },
               ),
               const SizedBox(height: 12),
@@ -94,7 +95,7 @@ class LoginWelcomeScreen extends StatelessWidget {
                 textColor: Colors.black,
                 borderColor: AppColors.primary,
                 onPressed: () {
-                  Navigator.pushNamed(context, '/login');
+                  context.go('/login/manager');
                 },
               ),
             ],
@@ -126,17 +127,17 @@ class InfoItem extends StatelessWidget {
 
 class CustomWelcomeButton extends StatelessWidget {
   final String label;
-  final VoidCallback onPressed;
   final Color backgroundColor;
   final Color textColor;
   final Color? borderColor;
+  final VoidCallback onPressed;
 
   const CustomWelcomeButton({
     required this.label,
-    required this.onPressed,
     required this.backgroundColor,
     required this.textColor,
     this.borderColor,
+    required this.onPressed,
     super.key,
   });
 

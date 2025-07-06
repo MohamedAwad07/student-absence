@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:student_absence/core/routing/app_router.dart';
+import 'package:student_absence/core/utils/app_extension.dart';
 import 'package:student_absence/core/utils/app_strings.dart';
 import 'package:student_absence/bloc_observer.dart';
-import 'package:student_absence/features/auth/login/presentation/login_welcome.dart';
 import 'package:student_absence/firebase_options.dart';
-import 'package:student_absence/features/splash/splash_screen.dart';
-import 'package:student_absence/features/auth/login/presentation/login_screen.dart';
-import 'package:student_absence/features/auth/register/presentation/register_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,27 +23,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: AppStrings.appName,
-      theme: ThemeData(useMaterial3: true, fontFamily: 'Cairo'),
-      locale: const Locale('ar'),
-      supportedLocales: [const Locale('ar')],
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      initialRoute: '/splash',
-      routes: {
-        '/splash': (context) => const SplashView(),
-        '/loginWelcome': (context) => const LoginWelcomeScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-      },
-      builder: (context, child) {
-        return Directionality(textDirection: TextDirection.rtl, child: child!);
-      },
+    return ScreenUtilInit(
+      designSize: Size(context.width, context.height),
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        title: AppStrings.appName,
+        theme: ThemeData(useMaterial3: true, fontFamily: 'Cairo'),
+        locale: const Locale('ar'),
+        supportedLocales: [const Locale('ar')],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        routerConfig: router,
+        builder: (context, child) {
+          return Directionality(
+            textDirection: TextDirection.rtl,
+            child: child!,
+          );
+        },
+      ),
     );
   }
 }

@@ -5,7 +5,8 @@ import 'package:student_absence/core/utils/app_strings.dart';
 import 'package:student_absence/features/auth/register/presentation/register_form.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  final String role;
+  const RegisterScreen({super.key, required this.role});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -33,7 +34,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     AppConstants.defaultBorderRadius,
                   ),
                 ),
-                child: const RegisterForm(),
+                child: RegisterForm(role: widget.role),
               ),
             ],
           ),
