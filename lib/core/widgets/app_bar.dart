@@ -39,7 +39,7 @@ class StudentHomeAppBar extends StatelessWidget {
             icon: const Icon(
               Icons.account_circle,
               color: Colors.white,
-              size: 24,
+              size: 32,
             ),
             onPressed: profileOnPressed,
           ),
