@@ -28,7 +28,7 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: AppRoutes.splash,
+  initialLocation: AppRoutes.supervisorHome,
   routes: [
     //* splash page
     GoRoute(

@@ -68,7 +68,7 @@ class StudentProfilePage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'د. محمد العمري',
+                                  'احمد عبد الله اسماعيل',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
