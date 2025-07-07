@@ -15,4 +15,41 @@ platform :android do
     release_notes: "A new version of the app has been released. Please update to the latest version."
   )
   end
+
+  desc "Distribute NEW release with comprehensive UI updates"
+  lane :new_release do
+    require 'dotenv'
+    Dotenv.load(File.expand_path('../../.env', __dir__))
+    sh "flutter clean"
+    sh "flutter build apk --release"
+    firebase_app_distribution(
+      app: ENV['FIREBASE_APP_ID'],
+      firebase_cli_token: ENV['FIREBASE_CLI_TOKEN'],
+      android_artifact_type: "APK",
+      android_artifact_path: "../build/app/outputs/flutter-apk/app-release.apk",
+      testers: "mmaatt712@gmail.com , yousefgus111@gmail.com",
+      release_notes: "🚀 NEW RELEASE - Student Absence Management App
+
+                        📱 What's New in This Release:
+                          
+                        ✅ Navigation & UI Enhancements:
+                        • Added comprehensive bottom navigation bar for all user roles
+                        • Implemented smooth navigation between different app sections
+                        • Enhanced overall user experience with intuitive navigation
+                          
+                        ✅ Role-Based UI Screens:
+                        • Student Interface: Complete UI implementation with all screens
+                        • Supervisor Interface: Full UI with excuse review and management
+                        • Manager Interface: Comprehensive dashboard and oversight screens
+                        • All role-specific features and navigation implemented
+                          
+                        ✅ Overall Progress:
+                        • 90% of app UI development completed
+                        • All major screens and user flows implemented
+                        • Consistent design language across all user roles
+                        • Responsive and user-friendly interface
+                          
+                        Please test all user roles and provide feedback on the new interface."
+    )
+  end
 end
