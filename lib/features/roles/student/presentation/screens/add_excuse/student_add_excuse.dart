@@ -1,194 +1,274 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:student_absence/core/routing/app_routes.dart';
+import 'package:student_absence/core/service%20locator/di.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
+import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
+import 'package:student_absence/features/roles/student/data/models/excuse.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_nav_bar_cubit.dart';
 
-class StudentAddExcusePage extends StatelessWidget {
+class StudentAddExcusePage extends StatefulWidget {
   const StudentAddExcusePage({super.key});
 
   @override
+  State<StudentAddExcusePage> createState() => _StudentAddExcusePageState();
+}
+
+class _StudentAddExcusePageState extends State<StudentAddExcusePage> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController dateController = TextEditingController();
+  final TextEditingController reasonController = TextEditingController();
+  String? excuseType;
+  bool agreed = false;
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController dateController = TextEditingController();
-    return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
-      body: CustomScrollView(
-        slivers: [
-          StudentHomeAppBar(profileOnPressed: () {}),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 12.0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 12),
-                  // Title
-                  const Center(
-                    child: Text(
-                      'نموذج تقديم العذر',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Center(
-                    child: Text(
-                      'يرجى تعبئة النموذج وتقديم العذر مع إرفاق المستندات المطلوبة',
-                      style: TextStyle(color: Colors.black54, fontSize: 13),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  // Excuse Type Dropdown
-                  _LabeledField(
-                    label: 'نوع العذر',
-                    child: DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'اختر نوع العذر',
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                      ),
-                      items: const [
-                        DropdownMenuItem(value: 'طبي', child: Text('عذر طبي')),
-                        DropdownMenuItem(value: 'سفر', child: Text('عذر سفر')),
-                        DropdownMenuItem(value: 'اخري', child: Text('اخري')),
-                      ],
-                      onChanged: (value) {},
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Date Picker
-                  _LabeledField(
-                    label: 'تاريخ الغياب',
-                    child: TextFormField(
-                      controller: dateController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'اختر التاريخ',
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                      ),
-                      readOnly: true,
-                      onTap: () async {
-                        final DateTime? picked = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        if (picked != null) {
-                          dateController.text =
-                              "${picked.year.toString().padLeft(4, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
-                        }
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Reason
-                  _LabeledField(
-                    label: 'سبب الغياب',
-                    child: TextFormField(
-                      minLines: 2,
-                      maxLines: 4,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'اكتب السبب بشكل تفصيلي',
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  // File Upload Section
-                  const Text(
-                    'إرفاق الملفات',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'يمكنك إرفاق المستندات الخاصة بالعذر (PDF، صور).',
-                    style: TextStyle(color: Colors.black54, fontSize: 12),
-                  ),
-                  const SizedBox(height: 10),
-                  const _FileUploadDemo(),
-                  const SizedBox(height: 18),
-                  // Checkbox
-                  Row(
+    return BlocListener<StudentCubit, StudentState>(
+      listener: (context, state) {
+        if (state is StudentExcuseSubmitted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+          context.go(AppRoutes.studentTrackExcuses);
+          context.read<StudentNavBarCubit>().setTab(1);
+        } else if (state is StudentError) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.scaffoldBackground,
+        body: CustomScrollView(
+          slivers: [
+            StudentHomeAppBar(
+              profileOnPressed: () {
+                context.go(AppRoutes.studentProfilePage);
+                context.read<StudentNavBarCubit>().setTab(4);
+              },
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 12.0,
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Checkbox(value: true, onChanged: (v) {}),
-                      const Expanded(
+                      const SizedBox(height: 12),
+                      const Center(
                         child: Text(
-                          'أتعهد بأن البيانات أعلاه صحيحة وجميع الملفات المُرفقة مُطابقة للأصل',
-                          style: TextStyle(fontSize: 13),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // Submit and Cancel Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
-                          onPressed: () {},
-                          child: const Text(
-                            'تقديم العذر',
-                            style: TextStyle(fontSize: 15, color: Colors.white),
+                          'نموذج تقديم العذر',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColors.primary),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
-                          onPressed: () {},
-                          child: const Text(
-                            'إلغاء',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: AppColors.primary,
-                            ),
-                          ),
+                      const SizedBox(height: 4),
+                      const Center(
+                        child: Text(
+                          'يرجى تعبئة النموذج وتقديم العذر مع إرفاق المستندات المطلوبة',
+                          style: TextStyle(color: Colors.black54, fontSize: 13),
+                          textAlign: TextAlign.center,
                         ),
                       ),
+                      const SizedBox(height: 18),
+                      _LabeledField(
+                        label: 'نوع العذر',
+                        child: DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'اختر نوع العذر',
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'طبي',
+                              child: Text('عذر طبي'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'سفر',
+                              child: Text('عذر سفر'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'اخري',
+                              child: Text('اخري'),
+                            ),
+                          ],
+                          value: excuseType,
+                          onChanged: (value) =>
+                              setState(() => excuseType = value),
+                          validator: (value) =>
+                              value == null ? 'يرجى اختيار نوع العذر' : null,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _LabeledField(
+                        label: 'تاريخ الغياب',
+                        child: TextFormField(
+                          controller: dateController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'اختر التاريخ',
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                          ),
+                          readOnly: true,
+                          onTap: () async {
+                            final DateTime? picked = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100),
+                            );
+                            if (picked != null) {
+                              dateController.text =
+                                  "${picked.year.toString().padLeft(4, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+                            }
+                          },
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'يرجى اختيار التاريخ'
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _LabeledField(
+                        label: 'سبب الغياب',
+                        child: TextFormField(
+                          controller: reasonController,
+                          minLines: 2,
+                          maxLines: 4,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'اكتب السبب بشكل تفصيلي',
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                          ),
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'يرجى كتابة السبب'
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      const Text(
+                        'إرفاق الملفات',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'يمكنك إرفاق المستندات الخاصة بالعذر (PDF، صور).',
+                        style: TextStyle(color: Colors.black54, fontSize: 12),
+                      ),
+                      const SizedBox(height: 10),
+                      const _FileUploadDemo(),
+                      const SizedBox(height: 18),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: agreed,
+                            onChanged: (v) =>
+                                setState(() => agreed = v ?? false),
+                          ),
+                          const Expanded(
+                            child: Text(
+                              'أتعهد بأن البيانات أعلاه صحيحة وجميع الملفات المُرفقة مُطابقة للأصل',
+                              style: TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: BlocBuilder<StudentCubit, StudentState>(
+                              builder: (context, state) {
+                                return ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                  ),
+                                  onPressed: (state is StudentLoading)
+                                      ? null
+                                      : () {
+                                          if (_formKey.currentState!
+                                                  .validate() &&
+                                              agreed) {
+                                            final user = FirebaseAuth
+                                                .instance
+                                                .currentUser!;
+                                            final excuse = StudentExcuseModel(
+                                              excuseId: DateTime.now()
+                                                  .millisecondsSinceEpoch
+                                                  .toString(),
+                                              studentId: user.uid,
+                                              reason: reasonController.text,
+                                              status: 'قيد المراجعة',
+                                              type: excuseType ?? 'أخري',
+                                              fileURL:
+                                                  null, // Add file logic if needed
+                                              imageURL: null,
+                                              supervisorId: null,
+                                              supervisorComment: null,
+                                              managerId: null,
+                                              managerComment: null,
+                                              createdAt: DateTime.now(),
+                                              updatedAt: null,
+                                            );
+                                            context
+                                                .read<StudentCubit>()
+                                                .submitExcuse(excuse);
+                                          } else {
+                                            toastLocator.warning(
+                                              context,
+                                              'يرجى التأكد من صحة البيانات وتأكيد الموافقة على الشروط والأحكام',
+                                            );
+                                          }
+                                        },
+                                  child: (state is StudentLoading)
+                                      ? const CircularProgressIndicator()
+                                      : const Text(
+                                          'تقديم العذر',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -234,15 +314,19 @@ class _FileUploadDemo extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             color: Colors.grey.shade100,
           ),
-          child: const Column(
+          child: Column(
             children: [
-              Icon(Icons.cloud_upload, color: AppColors.primary, size: 32),
-              SizedBox(height: 8),
-              Text('اسحب الملفات هنا أو', style: TextStyle(fontSize: 13)),
-              SizedBox(height: 4),
+              const Icon(
+                Icons.cloud_upload,
+                color: AppColors.primary,
+                size: 32,
+              ),
+              const SizedBox(height: 8),
+              const Text('اسحب الملفات هنا أو', style: TextStyle(fontSize: 13)),
+              const SizedBox(height: 4),
               ElevatedButton(
-                onPressed: null,
-                style: ButtonStyle(
+                onPressed: imagePickerLocator.pickImageFromGallery,
+                style: const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(AppColors.primary),
                   foregroundColor: WidgetStatePropertyAll(Colors.white),
                   padding: WidgetStatePropertyAll(
@@ -254,10 +338,10 @@ class _FileUploadDemo extends StatelessWidget {
                     ),
                   ),
                 ),
-                child: Text('اختر ملف'),
+                child: const Text('اختر ملف'),
               ),
-              SizedBox(height: 4),
-              Text(
+              const SizedBox(height: 4),
+              const Text(
                 'يسمح برفع ملفات (JPG, PNG, PDF) بحد أقصى 5 ميجا',
                 style: TextStyle(fontSize: 11, color: Colors.black54),
               ),
