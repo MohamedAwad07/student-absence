@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
@@ -25,6 +26,9 @@ import 'package:student_absence/features/roles/supervisor/presentation/screens/p
 import 'package:student_absence/features/roles/supervisor/presentation/supervisor_nav_bar.dart';
 import 'package:student_absence/features/splash/splash_screen.dart';
 import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
+import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_nav_bar_cubit.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -135,7 +139,17 @@ GoRouter createAppRouter(AuthCubit authCubit) {
       // * Shell Route for Student
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
-        builder: (context, state, child) => StudentBottomNavBar(child: child),
+        builder: (context, state, child) => MultiBlocProvider(
+          providers: [
+            BlocProvider<StudentCubit>(
+              create: (_) => StudentCubit()..getExcuses(FirebaseAuth.instance.currentUser!.uid),
+            ),
+            BlocProvider<StudentNavBarCubit>(
+              create: (_) => StudentNavBarCubit(),
+            ),
+          ],
+          child: StudentBottomNavBar(child: child),
+        ),
         routes: [
           GoRoute(
             path: AppRoutes.studentHome,

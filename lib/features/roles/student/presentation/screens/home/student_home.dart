@@ -3,17 +3,27 @@ import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
+import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
+import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_nav_bar_cubit.dart';
 
 class StudentHomePage extends StatelessWidget {
   const StudentHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final userModel = context.read<AuthCubit>().currentUser;
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          StudentHomeAppBar(profileOnPressed: () {}),
+          StudentHomeAppBar(
+            profileOnPressed: () {
+              context.go(AppRoutes.studentProfilePage);
+              context.read<StudentNavBarCubit>().setTab(4);
+            },
+          ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(
@@ -23,9 +33,9 @@ class StudentHomePage extends StatelessWidget {
               child: Column(
                 children: [
                   // Profile Section
-                  const Column(
+                  Column(
                     children: [
-                      CircleAvatar(
+                      const CircleAvatar(
                         radius: 36,
                         backgroundColor: Color(0xFFD4A63A),
                         child: Icon(
@@ -34,58 +44,155 @@ class StudentHomePage extends StatelessWidget {
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
-                        'أحمد محمد مهدي',
-                        style: TextStyle(
+                        userModel?.name ?? "غير معروف",
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
                       ),
-                      SizedBox(height: 2),
+                      const SizedBox(height: 2),
                       Text(
-                        'رقم الطالب: 445521',
-                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                        'رقم الطالب: ${userModel?.academicNumber}',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  // Summary Cards
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _SummaryCard(
-                        count: 3,
-                        label: 'مقبولة',
-                        color: Color(0xFF4CAF50),
-                      ),
-                      _SummaryCard(
-                        count: 1,
-                        label: 'قيد المراجعة',
-                        color: Color(0xFFFFC107),
-                      ),
-                      _SummaryCard(
-                        count: 2,
-                        label: 'مرفوضة',
-                        color: Color(0xFFF44336),
-                      ),
-                    ],
+                  // Summary Cards (static for now)
+                  BlocBuilder<StudentCubit, StudentState>(
+                    builder: (context, state) {
+                      int accepted = 0;
+                      int pending = 0;
+                      int rejected = 0;
+                      if (state is StudentExcusesLoaded) {
+                        accepted = state.excuses
+                            .where((e) => e.status == 'مقبولة')
+                            .length;
+                        pending = state.excuses
+                            .where((e) => e.status == 'قيد المراجعة')
+                            .length;
+                        rejected = state.excuses
+                            .where((e) => e.status == 'مرفوضة')
+                            .length;
+                      }
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _SummaryCard(
+                            count: accepted,
+                            label: 'مقبولة',
+                            color: const Color(0xFF4CAF50),
+                          ),
+                          _SummaryCard(
+                            count: pending,
+                            label: 'قيد المراجعة',
+                            color: const Color(0xFFFFC107),
+                          ),
+                          _SummaryCard(
+                            count: rejected,
+                            label: 'مرفوضة',
+                            color: const Color(0xFFF44336),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   const SizedBox(height: 18),
                   // Latest Excuses
-                  _SectionTitle(title: 'ملخص الأعذار', onPressed: () {}),
+                  _SectionTitle(
+                    title: 'ملخص الأعذار',
+                    onPressed: () {
+                      context.go(AppRoutes.studentTrackExcuses);
+                      context.read<StudentNavBarCubit>().setTab(1);
+                    },
+                  ),
                   const SizedBox(height: 8),
-                  _ExcuseList(),
+                  BlocBuilder<StudentCubit, StudentState>(
+                    builder: (context, state) {
+                      if (state is StudentLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (state is StudentExcusesLoaded) {
+                        final excuses = state.excuses.toList()
+                          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+                        final latestExcuses = excuses.take(3).toList();
+                        if (latestExcuses.isEmpty) {
+                          return const Center(child: Text('لا توجد أعذار بعد'));
+                        }
+                        return Column(
+                          children: latestExcuses.map((excuse) {
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              child: ListTile(
+                                leading: Icon(
+                                  Icons.description,
+                                  color: _statusColor(excuse.status),
+                                ),
+                                title: Text(
+                                  excuse.reason,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'تاريخ التقديم: ${excuse.createdAt.toString().split(' ').first}',
+                                ),
+                                trailing: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: _statusColor(
+                                      excuse.status,
+                                    ).withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    excuse.status,
+                                    style: TextStyle(
+                                      color: _statusColor(excuse.status),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      } else if (state is StudentError) {
+                        return Text(
+                          state.message,
+                          style: const TextStyle(color: Colors.red),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                   const SizedBox(height: 18),
-                  // Notifications
-                  _SectionTitle(title: 'الإشعارات', onPressed: () {}),
+                  // Notifications (static for now)
+                  _SectionTitle(
+                    title: 'الإشعارات',
+                    onPressed: () {
+                      context.go(AppRoutes.studentNotifications);
+                      context.read<StudentNavBarCubit>().setTab(3);
+                    },
+                  ),
                   const SizedBox(height: 8),
                   _NotificationList(),
                   const SizedBox(height: 24),
                   // Settings Button
                   Center(
                     child: TextButton.icon(
-                      onPressed: () => context.go(AppRoutes.studentProfilePage),
+                      onPressed: () {
+                        context.go(AppRoutes.studentProfilePage);
+                        context.read<StudentNavBarCubit>().setTab(4);
+                      },
                       icon: const Icon(
                         Icons.settings,
                         color: Color(0xFF225A2A),
@@ -185,69 +292,16 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-class _ExcuseList extends StatelessWidget {
-  final List<Map<String, String>> excuses = const [
-    {'title': 'عذر طبي', 'status': 'مقبولة', 'date': '2023-04-15'},
-    {
-      'title': 'عذر غياب - محاضرة برمجة',
-      'status': 'قيد المراجعة',
-      'date': '2023-04-10',
-    },
-    {
-      'title': 'عذر غياب - محاضرة شبكات',
-      'status': 'مرفوضة',
-      'date': '2023-04-05',
-    },
-  ];
-
-  Color _statusColor(String status) {
-    switch (status) {
-      case 'مقبولة':
-        return const Color(0xFF4CAF50);
-      case 'قيد المراجعة':
-        return const Color(0xFFFFC107);
-      case 'مرفوضة':
-        return const Color(0xFFF44336);
-      default:
-        return Colors.grey;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: excuses.map((excuse) {
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          child: ListTile(
-            leading: Icon(
-              Icons.description,
-              color: _statusColor(excuse['status']!),
-            ),
-            title: Text(
-              excuse['title']!,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text('تاريخ التقديم: ${excuse['date']}'),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: _statusColor(excuse['status']!).withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                excuse['status']!,
-                style: TextStyle(
-                  color: _statusColor(excuse['status']!),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
+Color _statusColor(String status) {
+  switch (status) {
+    case 'مقبولة':
+      return const Color(0xFF4CAF50);
+    case 'قيد المراجعة':
+      return const Color(0xFFFFC107);
+    case 'مرفوضة':
+      return const Color(0xFFF44336);
+    default:
+      return Colors.grey;
   }
 }
 

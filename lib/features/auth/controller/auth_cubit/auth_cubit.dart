@@ -78,7 +78,6 @@ class AuthCubit extends Cubit<AuthState> {
           ),
         );
       } else {
-        log("tesssssssssssssssssssssssssssssssss");
         emit(Authenticated(user: currentUser!));
       }
     }, (failure) => emit(Unauthenticated(errorMessage: failure.message)));

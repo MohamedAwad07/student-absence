@@ -6,16 +6,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_nav_bar_cubit.dart';
 
-class StudentBottomNavBar extends StatefulWidget {
+class StudentBottomNavBar extends StatelessWidget {
   const StudentBottomNavBar({super.key, required this.child});
   final Widget child;
-  @override
-  State<StudentBottomNavBar> createState() => _StudentBottomNavBarState();
-}
-
-class _StudentBottomNavBarState extends State<StudentBottomNavBar> {
-  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     final List<TabItem> items = [
@@ -30,68 +26,62 @@ class _StudentBottomNavBarState extends State<StudentBottomNavBar> {
       canPop: false,
       child: Scaffold(
         backgroundColor: AppColors.scaffoldBackground,
-        body: widget.child,
+        body: child,
         bottomNavigationBar: Directionality(
           textDirection: TextDirection.ltr,
-          child: BottomBarCreative(
-            items: items,
-            bottom: 5.h,
-            blur: 0,
-            enableShadow: false,
-            iconSize: 30.sp,
-            pad: 0,
-            paddingVertical: 0,
-            backgroundColor: AppColors.primary,
-            color: AppColors.white,
-            colorSelected: AppColors.secondary,
-            indexSelected: selectedIndex,
-            isFloating: true,
-            highlightStyle: const HighlightStyle(
-              sizeLarge: true,
-              isHexagon: true,
-              elevation: 2,
-            ),
-            onTap: (int index) => setState(() {
-              changeTab(index);
-            }),
+          child: BlocBuilder<StudentNavBarCubit, int>(
+            builder: (context, selectedIndex) {
+              return BottomBarCreative(
+                items: items,
+                bottom: 5.h,
+                blur: 0,
+                enableShadow: false,
+                iconSize: 30.sp,
+                pad: 0,
+                paddingVertical: 0,
+                backgroundColor: AppColors.primary,
+                color: AppColors.white,
+                colorSelected: AppColors.secondary,
+                indexSelected: selectedIndex,
+                isFloating: true,
+                highlightStyle: const HighlightStyle(
+                  sizeLarge: true,
+                  isHexagon: true,
+                  elevation: 2,
+                ),
+                onTap: (int index) {
+                  _changeTab(context, index);
+                },
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  void changeTab(int index) async {
+  void _changeTab(BuildContext context, int index) {
+    final cubit = context.read<StudentNavBarCubit>();
     switch (index) {
       case 0:
         context.go(AppRoutes.studentHome);
-        setState(() {
-          selectedIndex = 0;
-        });
+        cubit.setTab(0);
         break;
       case 1:
         context.go(AppRoutes.studentTrackExcuses);
-        setState(() {
-          selectedIndex = 1;
-        });
+        cubit.setTab(1);
         break;
-
       case 2:
         context.go(AppRoutes.studentAddExcuses);
-        setState(() {
-          selectedIndex = 2;
-        });
+        cubit.setTab(2);
         break;
       case 3:
         context.go(AppRoutes.studentNotifications);
-        setState(() {
-          selectedIndex = 3;
-        });
+        cubit.setTab(3);
         break;
       case 4:
         context.go(AppRoutes.studentProfilePage);
-        setState(() {
-          selectedIndex = 4;
-        });
+        cubit.setTab(4);
         break;
       default:
         break;
