@@ -5,6 +5,8 @@ import 'package:student_absence/core/utils/image_picker.dart';
 import 'package:student_absence/core/utils/toasts.dart';
 import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
 import 'package:student_absence/features/auth/controller/firebase_service.dart';
+import 'package:student_absence/features/roles/student/data/data_source/remote_data_source.dart';
+import 'package:student_absence/features/roles/student/data/repos/repo.dart';
 
 final locator = GetIt.instance;
 
@@ -14,6 +16,7 @@ void setUp() {
   locator.registerSingleton<ToastsHelper>(ToastsHelper());
   locator.registerSingleton<AssetsPickerHelper>(AssetsPickerHelper());
   locator.registerSingleton<AuthCubit>(AuthCubit());
+  locator.registerLazySingleton<StudentRepo>(() => FirebaseRemoteDataSource());
 }
 
 final imagePickerLocator = locator<AssetsPickerHelper>();
@@ -21,3 +24,4 @@ final authLocator = locator<AuthController>();
 final firestoreLocator = locator<FirebaseFirestore>();
 final toastLocator = locator<ToastsHelper>();
 final authCubitLocator = locator<AuthCubit>();
+final studentRepoLocator = locator<StudentRepo>();
