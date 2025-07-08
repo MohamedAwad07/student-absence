@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
 import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
 import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_nav_bar_cubit.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class StudentHomePage extends StatelessWidget {
   const StudentHomePage({super.key});
@@ -66,6 +67,7 @@ class StudentHomePage extends StatelessWidget {
                   // Summary Cards (static for now)
                   BlocBuilder<StudentCubit, StudentState>(
                     builder: (context, state) {
+                      final isLoading = state is StudentLoading;
                       int accepted = 0;
                       int pending = 0;
                       int rejected = 0;
@@ -80,25 +82,28 @@ class StudentHomePage extends StatelessWidget {
                             .where((e) => e.status == 'مرفوضة')
                             .length;
                       }
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _SummaryCard(
-                            count: accepted,
-                            label: 'مقبولة',
-                            color: const Color(0xFF4CAF50),
-                          ),
-                          _SummaryCard(
-                            count: pending,
-                            label: 'قيد المراجعة',
-                            color: const Color(0xFFFFC107),
-                          ),
-                          _SummaryCard(
-                            count: rejected,
-                            label: 'مرفوضة',
-                            color: const Color(0xFFF44336),
-                          ),
-                        ],
+                      return Skeletonizer(
+                        enabled: isLoading,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _SummaryCard(
+                              count: accepted,
+                              label: 'مقبولة',
+                              color: const Color(0xFF4CAF50),
+                            ),
+                            _SummaryCard(
+                              count: pending,
+                              label: 'قيد المراجعة',
+                              color: const Color(0xFFFFC107),
+                            ),
+                            _SummaryCard(
+                              count: rejected,
+                              label: 'مرفوضة',
+                              color: const Color(0xFFF44336),
+                            ),
+                          ],
+                        ),
                       );
                     },
                   ),
@@ -114,56 +119,80 @@ class StudentHomePage extends StatelessWidget {
                   const SizedBox(height: 8),
                   BlocBuilder<StudentCubit, StudentState>(
                     builder: (context, state) {
-                      if (state is StudentLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (state is StudentExcusesLoaded) {
+                      final isLoading = state is StudentLoading;
+                      if (state is StudentExcusesLoaded) {
                         final excuses = state.excuses.toList()
                           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
                         final latestExcuses = excuses.take(3).toList();
                         if (latestExcuses.isEmpty) {
                           return const Center(child: Text('لا توجد أعذار بعد'));
                         }
-                        return Column(
-                          children: latestExcuses.map((excuse) {
-                            return Card(
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                              child: ListTile(
-                                leading: Icon(
-                                  Icons.description,
-                                  color: _statusColor(excuse.status),
-                                ),
-                                title: Text(
-                                  excuse.reason,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
+                        return Skeletonizer(
+                          enabled: false,
+                          child: Column(
+                            children: latestExcuses.map((excuse) {
+                              return Card(
+                                margin: const EdgeInsets.symmetric(vertical: 4),
+                                child: ListTile(
+                                  leading: Icon(
+                                    Icons.description,
+                                    color: _statusColor(excuse.status),
                                   ),
-                                ),
-                                subtitle: Text(
-                                  'تاريخ التقديم: ${excuse.createdAt.toString().split(' ').first}',
-                                ),
-                                trailing: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: _statusColor(
-                                      excuse.status,
-                                    ).withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    excuse.status,
-                                    style: TextStyle(
-                                      color: _statusColor(excuse.status),
+                                  title: Text(
+                                    excuse.reason,
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    'تاريخ التقديم: ${excuse.createdAt.toString().split(' ').first}',
+                                  ),
+                                  trailing: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: _statusColor(
+                                        excuse.status,
+                                      ).withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      excuse.status,
+                                      style: TextStyle(
+                                        color: _statusColor(excuse.status),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
                                 ),
+                              );
+                            }).toList(),
+                          ),
+                        );
+                      } else if (isLoading) {
+                        return Skeletonizer(
+                          enabled: true,
+                          child: Column(
+                            children: List.generate(3, (index) => Card(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              child: ListTile(
+                                leading: const Icon(Icons.description),
+                                title: const Text('عنوان العذر'),
+                                subtitle: const Text('تاريخ التقديم: 2023-01-01'),
+                                trailing: Container(
+                                  width: 48,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
                               ),
-                            );
-                          }).toList(),
+                            )),
+                          ),
                         );
                       } else if (state is StudentError) {
                         return Text(
