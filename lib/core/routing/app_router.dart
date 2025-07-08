@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:student_absence/features/auth/login/presentation/login_screen.dart';
 import 'package:student_absence/features/auth/login/presentation/login_welcome.dart';
+import 'package:student_absence/features/auth/presentation/auth_gate.dart';
 import 'package:student_absence/features/auth/register/presentation/register_screen.dart';
 import 'package:student_absence/features/roles/manager/presentation/manager_bottom_nav.dart';
 import 'package:student_absence/features/roles/manager/presentation/screens/excuse_details/manager_excuse_details.dart';
@@ -37,6 +38,22 @@ final router = GoRouter(
         return CustomTransitionPage(
           key: state.pageKey,
           child: const SplashView(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: CurveTween(curve: Curves.easeInQuad).animate(animation),
+              child: child,
+            );
+          },
+        );
+      },
+    ),
+    //* Auth Gate
+    GoRoute(
+      path: AppRoutes.authGate,
+      pageBuilder: (context, state) {
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: const AuthGate(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(
               opacity: CurveTween(curve: Curves.easeInQuad).animate(animation),

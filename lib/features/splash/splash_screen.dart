@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/utils/app_assets.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:student_absence/core/utils/app_strings.dart';
+import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -18,6 +20,7 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
+    context.read<AuthCubit>().checkAuthState();
 
     Future.delayed(const Duration(milliseconds: 200), () {
       if (!mounted) return;
@@ -79,28 +82,15 @@ class _SplashViewState extends State<SplashView> {
     );
   }
 
-  // void _navigateToHome() {
-  //   Future.delayed(const Duration(seconds: 2), () {
-  //     if (!mounted) return;
-  //     setState(() {
-  //       _opacity = 0.0;
-  //     });
-  //     Future.delayed(const Duration(milliseconds: 800), () {
-  //       if (!mounted) return;
-  //       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-  //     });
-  //   });
-  // }
-
   void _navigateToLogin() {
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
       setState(() {
         _opacity = 0.0;
       });
       Future.delayed(const Duration(milliseconds: 800), () {
         if (!mounted) return;
-        context.go(AppRoutes.loginWelcome);
+        context.go(AppRoutes.authGate);
       });
     });
   }

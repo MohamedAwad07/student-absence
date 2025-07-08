@@ -8,14 +8,18 @@ import 'package:student_absence/core/routing/app_router.dart';
 import 'package:student_absence/core/utils/app_extension.dart';
 import 'package:student_absence/core/utils/app_strings.dart';
 import 'package:student_absence/bloc_observer.dart';
+import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
 import 'package:student_absence/firebase_options.dart';
 import 'package:flutter/services.dart';
+
+import 'core/service locator/di.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   Bloc.observer = Observe();
   await dotenv.load(fileName: ".env");
+  setUp();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -23,7 +27,12 @@ void main() async {
       statusBarBrightness: Brightness.light,
     ),
   );
-  runApp(const MyApp());
+  runApp(
+    BlocProvider<AuthCubit>(
+      create: (context) => AuthCubit(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
