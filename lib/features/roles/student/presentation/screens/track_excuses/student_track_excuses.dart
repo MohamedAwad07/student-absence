@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
+import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_nav_bar_cubit.dart';
+import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
 
 class StudentTrackExcuses extends StatelessWidget {
   const StudentTrackExcuses({super.key});
@@ -11,7 +16,12 @@ class StudentTrackExcuses extends StatelessWidget {
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          StudentHomeAppBar(profileOnPressed: () {}),
+          StudentHomeAppBar(
+            profileOnPressed: () {
+              context.go(AppRoutes.studentProfilePage);
+              context.read<StudentNavBarCubit>().setTab(4);
+            },
+          ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(
@@ -22,7 +32,7 @@ class StudentTrackExcuses extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Section Title
-                  const SizedBox(height: 8),
+                  // const SizedBox(height: 8),
                   const Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: 16.0,
@@ -44,12 +54,11 @@ class StudentTrackExcuses extends StatelessWidget {
                           'يمكنك متابعة حالة الأعذار الخاصة بك',
                           style: TextStyle(color: Colors.black54, fontSize: 13),
                         ),
-                        SizedBox(height: 16),
                       ],
                     ),
                   ),
                   // Excuses List
-                  _ExcuseTrackList(),
+                  const _ExcuseTrackList(),
                   const SizedBox(height: 32),
                   // Submit New Excuse Button
                   Center(
@@ -63,7 +72,10 @@ class StudentTrackExcuses extends StatelessWidget {
                             borderRadius: BorderRadius.circular(24),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          context.go(AppRoutes.studentAddExcuses);
+                          context.read<StudentNavBarCubit>().setTab(2);
+                        },
                         child: const Text(
                           'تقديم عذر جديد',
                           style: TextStyle(fontSize: 15, color: Colors.white),
@@ -82,20 +94,15 @@ class StudentTrackExcuses extends StatelessWidget {
 }
 
 class _ExcuseTrackList extends StatelessWidget {
-  final List<Map<String, String>> excuses = const [
-    {'title': 'عذر طبي', 'status': 'قيد المراجعة', 'date': '2023-04-15'},
-    {'title': 'عذر سفر', 'status': 'مقبول', 'date': '2023-04-12'},
-    {'title': 'عذر طبي', 'status': 'مرفوض', 'date': '2023-04-10'},
-    {'title': 'عذر سفر', 'status': 'مقبول', 'date': '2023-04-08'},
-  ];
+  const _ExcuseTrackList();
 
   Color _statusColor(String status) {
     switch (status) {
       case 'قيد المراجعة':
         return AppColors.secondary;
-      case 'مقبول':
+      case 'مقبولة':
         return AppColors.primary;
-      case 'مرفوض':
+      case 'مرفوضة':
         return const Color(0xFFF44336);
       default:
         return Colors.grey;
@@ -104,50 +111,77 @@ class _ExcuseTrackList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        children: excuses.map((excuse) {
-          return Column(
+    return BlocBuilder<StudentCubit, StudentState>(
+      builder: (context, state) {
+        final excuses = context.read<StudentCubit>().excuses;
+        if (excuses.isEmpty) {
+          return const Column(
             children: [
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 0,
-                ),
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          excuse['title']!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                        const Spacer(),
-                        _StatusChip(
-                          status: excuse['status']!,
-                          color: _statusColor(excuse['status']!),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                ),
-                subtitle: Text(
-                  'تاريخ التقديم: ${excuse['date']}',
-                  style: const TextStyle(fontSize: 12, color: Colors.black54),
-                ),
-              ),
-              const Divider(height: 1, thickness: 0.5, indent: 8, endIndent: 8),
+              SizedBox(height: 24),
+              Center(child: Text('لا توجد أعذار بعد')),
             ],
           );
-        }).toList(),
-      ),
+        }
+        return Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: excuses.map((excuse) {
+              return Column(
+                children: [
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 0,
+                    ),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                excuse.reason,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            _StatusChip(
+                              status: excuse.status,
+                              color: _statusColor(excuse.status),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                    subtitle: Text(
+                      'تاريخ التقديم: ${excuse.createdAt.toString().split(' ').first}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ),
+                  const Divider(
+                    height: 1,
+                    thickness: 0.5,
+                    indent: 8,
+                    endIndent: 8,
+                  ),
+                ],
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 }

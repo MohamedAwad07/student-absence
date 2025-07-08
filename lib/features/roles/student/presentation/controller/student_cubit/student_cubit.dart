@@ -11,6 +11,7 @@ part 'student_state.dart';
 class StudentCubit extends Cubit<StudentState> {
   StudentCubit() : super(StudentInitial());
 
+  List<StudentExcuseModel> excuses = [];
   // Submit an excuse
   Future<void> submitExcuse(StudentExcuseModel excuseModel) async {
     emit(StudentLoading());
@@ -37,10 +38,10 @@ class StudentCubit extends Cubit<StudentState> {
   Future<void> getExcuses(String userId) async {
     emit(StudentLoading());
     final result = await studentRepoLocator.getExcuses(userId: userId);
-    result.fold(
-      (failure) => emit(StudentError(failure.message)),
-      (excuses) => emit(StudentExcusesLoaded(excuses)),
-    );
+    result.fold((failure) => emit(StudentError(failure.message)), (excuses) {
+      this.excuses = excuses;
+      emit(StudentExcusesLoaded(excuses));
+    });
   }
 
   void testSubmitExcuse() async {
