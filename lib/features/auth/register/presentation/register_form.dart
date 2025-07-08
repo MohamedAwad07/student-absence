@@ -60,10 +60,7 @@ class RegisterFormState extends State<RegisterForm> {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is Authenticated) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registration successful!')),
-          );
-          switch (widget.role) {
+          switch (selectedRole) {
             case 'student':
               context.go(AppRoutes.studentHome);
               break;
@@ -80,6 +77,7 @@ class RegisterFormState extends State<RegisterForm> {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
+          context.read<AuthCubit>().reset();
         }
       },
       child: Form(

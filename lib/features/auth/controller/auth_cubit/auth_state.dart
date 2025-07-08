@@ -72,6 +72,13 @@ class Authenticated extends AuthState {
   List<Object?> get props => [user];
 }
 
+class RoleException extends AuthState {
+  final String message;
+  RoleException({required this.message});
+  @override
+  List<Object?> get props => [message];
+}
+
 class Unauthenticated extends AuthState {
   final String errorMessage;
   Unauthenticated({required this.errorMessage});

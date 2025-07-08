@@ -123,7 +123,7 @@ class _SummaryCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
+          color: color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -232,7 +232,7 @@ class _ExcuseList extends StatelessWidget {
             trailing: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: _statusColor(excuse['status']!).withOpacity(0.15),
+                color: _statusColor(excuse['status']!).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,7 +32,7 @@ class AuthController {
         'role': userModel.role,
         'academicNumber': userModel.academicNumber,
       });
-      return Left(AuthSuccess(userId, 'User Created successfully'));
+      return Left(AuthSuccess(userId: userId, message: 'User Created successfully'));
     } on FirebaseAuthException catch (e) {
       return Right(AuthFail(handleSignUpError(e)));
     }
@@ -57,8 +59,9 @@ class AuthController {
         password: password,
       );
 
-      return Left(AuthSuccess(result.user!.uid, 'User logged in successfully'));
+      return Left(AuthSuccess(userId: result.user!.uid, message:'User logged in successfully'));
     } on FirebaseAuthException catch (e) {
+      log(e.toString());
       return Right(AuthFail(handleLoginError(e)));
     }
   }
@@ -156,9 +159,9 @@ class AuthController {
 // Auth States
 class AuthSuccess {
   final String userId;
-  final String message;
+  final String? message;
 
-  AuthSuccess(this.userId, this.message);
+  AuthSuccess({required this.userId, this.message});
 }
 
 class AuthFail {

@@ -11,7 +11,6 @@ import 'package:student_absence/bloc_observer.dart';
 import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
 import 'package:student_absence/firebase_options.dart';
 import 'package:flutter/services.dart';
-
 import 'core/service locator/di.dart';
 
 void main() async {
@@ -27,19 +26,22 @@ void main() async {
       statusBarBrightness: Brightness.light,
     ),
   );
+  final authCubit = AuthCubit();
   runApp(
     BlocProvider<AuthCubit>(
-      create: (context) => AuthCubit(),
-      child: const MyApp(),
+      create: (context) => authCubit,
+      child: MyApp(authCubit: authCubit),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AuthCubit authCubit;
+  const MyApp({super.key, required this.authCubit});
 
   @override
   Widget build(BuildContext context) {
+    final router = createAppRouter(authCubit);
     return ScreenUtilInit(
       designSize: Size(context.width, context.height),
       child: MaterialApp.router(

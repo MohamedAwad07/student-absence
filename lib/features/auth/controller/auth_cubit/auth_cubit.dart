@@ -13,6 +13,7 @@ class AuthCubit extends Cubit<AuthState> {
   UserModel? currentUser;
 
   void checkAuthState() {
+    log("i am in check auth state");
     emit(AuthLoading());
     FirebaseAuth.instance.authStateChanges().listen((firebaseUser) async {
       if (firebaseUser != null) {
@@ -21,10 +22,12 @@ class AuthCubit extends Cubit<AuthState> {
             .doc(firebaseUser.uid)
             .get();
         log("userDoc : ${userDoc.data().toString()}");
-        log("user : ${firebaseUser.uid}");
-        currentUser = UserModel.fromJson(userDoc.data(), firebaseUser.uid);
-
-        emit(Authenticated(user: currentUser!));
+        if (userDoc.data() != null) {
+          currentUser = UserModel.fromJson(userDoc.data(), firebaseUser.uid);
+          emit(Authenticated(user: currentUser!));
+        } else {
+          emit(Unauthenticated(errorMessage: 'User data not found'));
+        }
       } else {
         emit(Unauthenticated(errorMessage: 'User is not logged in'));
       }
@@ -50,22 +53,34 @@ class AuthCubit extends Cubit<AuthState> {
     }, (failure) => emit(Unauthenticated(errorMessage: failure.message)));
   }
 
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login({
+    required String email,
+    required String password,
+    required String role,
+  }) async {
     emit(AuthLoading());
     final result = await authLocator.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
+
     result.fold((success) async {
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .doc(success.userId)
           .get();
-      currentUser = UserModel.fromJson(
-        userDoc.data(),
-        FirebaseAuth.instance.currentUser!.uid,
-      );
-      emit(Authenticated(user: currentUser!));
+      currentUser = UserModel.fromJson(userDoc.data(), success.userId);
+      if (currentUser!.role != role) {
+        emit(
+          RoleException(
+            message:
+                "الدور المختار لا يتطابق مع دور الحساب. يرجى اختيار الدور الصحيح.",
+          ),
+        );
+      } else {
+        log("tesssssssssssssssssssssssssssssssss");
+        emit(Authenticated(user: currentUser!));
+      }
     }, (failure) => emit(Unauthenticated(errorMessage: failure.message)));
   }
 
