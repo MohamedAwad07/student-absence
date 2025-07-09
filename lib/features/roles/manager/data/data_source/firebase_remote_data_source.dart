@@ -39,8 +39,10 @@ class ManagerFirebaseRemoteDataSource implements ManagerRepo {
             studentAcademicNumber: studentData['academicNumber'] ?? '',
             status: excuseData['status'] ?? '',
             reason: excuseData['reason'] ?? '',
+            supervisorComment: excuseData['supervisorComment'] ?? '',
             type: excuseData['type'] ?? '',
             createdAt: (excuseData['createdAt'] as Timestamp).toDate(),
+            updatedAt: excuseData['updatedAt'] != null ? (excuseData['updatedAt'] as Timestamp).toDate() : null,
             fileURL: excuseData['fileURL'],
             imageURL: excuseData['imageURL'],
           );
@@ -83,8 +85,10 @@ class ManagerFirebaseRemoteDataSource implements ManagerRepo {
             studentAcademicNumber: studentData['academicNumber'] ?? '',
             status: excuseData['status'] ?? '',
             reason: excuseData['reason'] ?? '',
+            supervisorComment: excuseData['supervisorComment'] ?? '',
             type: excuseData['type'] ?? '',
             createdAt: (excuseData['createdAt'] as Timestamp).toDate(),
+            updatedAt: excuseData['updatedAt'] != null ? (excuseData['updatedAt'] as Timestamp).toDate() : null,
             fileURL: excuseData['fileURL'],
             imageURL: excuseData['imageURL'],
           );

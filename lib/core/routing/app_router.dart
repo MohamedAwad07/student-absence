@@ -468,19 +468,78 @@ GoRouter createAppRouter(AuthCubit authCubit) {
             path: AppRoutes.managerExcuseDetails,
             parentNavigatorKey: _shellNavigatorKey,
             pageBuilder: (context, state) {
-              return CustomTransitionPage(
-                key: state.pageKey,
-                child: const ManagerExcuseDetails(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                      return FadeTransition(
-                        opacity: CurveTween(
-                          curve: Curves.easeInQuad,
-                        ).animate(animation),
-                        child: child,
-                      );
-                    },
-              );
+              final extra = state.extra;
+              if (extra is GetExcuseInfoModel) {
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: ManagerExcuseDetails(excuse: extra),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(
+                          opacity: CurveTween(
+                            curve: Curves.easeInQuad,
+                          ).animate(animation),
+                          child: child,
+                        );
+                      },
+                );
+              } else {
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: Scaffold(
+                    backgroundColor: AppColors.scaffoldBackground,
+                    body: CustomScrollView(
+                      slivers: [
+                        BuildCustomAppBar(profileOnPressed: () {}),
+                        const SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: 8.0,
+                              right: 24.0,
+                              top: 16,
+                              bottom: 12,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'تفاصيل العذر',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                                SizedBox(height: 24),
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'لا توجد اعذار جديدة',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(
+                          opacity: CurveTween(
+                            curve: Curves.easeInQuad,
+                          ).animate(animation),
+                          child: child,
+                        );
+                      },
+                );
+              }
             },
           ),
           GoRoute(

@@ -8,6 +8,7 @@ import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:student_absence/core/utils/nav_bar_cubit.dart';
+import 'package:student_absence/features/roles/manager/presentation/controller/manager_cubit/manager_cubit.dart';
 
 class ManagerBottomNavBar extends StatelessWidget {
   const ManagerBottomNavBar({super.key, required this.child});
@@ -70,7 +71,19 @@ class ManagerBottomNavBar extends StatelessWidget {
         cubit.setTab(1);
         break;
       case 2:
-        context.go(AppRoutes.managerExcuseDetails);
+        final managerCubit = context.read<ManagerCubit>();
+        final pendingExcuses = managerCubit.pendingExcuses;
+        if (pendingExcuses.isNotEmpty) {
+          context.go(
+            AppRoutes.managerExcuseDetails,
+            extra: pendingExcuses.first,
+          );
+        } else {
+          context.go(
+            AppRoutes.managerExcuseDetails,
+            extra: null,
+          );
+        }
         cubit.setTab(2);
         break;
       case 3:

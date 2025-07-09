@@ -5,8 +5,10 @@ class GetExcuseInfoModel {
   final String studentAcademicNumber;
   final String status;
   final String reason;
+  String? supervisorComment;
   final String type;
   final DateTime createdAt;
+  DateTime? updatedAt;
   String? fileURL;
   String? imageURL;
 
@@ -17,8 +19,10 @@ class GetExcuseInfoModel {
     required this.studentAcademicNumber,
     required this.status,
     required this.reason,
+    this.supervisorComment,
     required this.type,
     required this.createdAt,
+    this.updatedAt,
     this.fileURL,
     this.imageURL,
   });

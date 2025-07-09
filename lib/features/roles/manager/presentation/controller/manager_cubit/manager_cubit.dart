@@ -10,6 +10,9 @@ part 'manager_state.dart';
 class ManagerCubit extends Cubit<ManagerState> {
   ManagerCubit() : super(ManagerInitial());
 
+  List<GetExcuseInfoModel> _pendingExcuses = [];
+  List<GetExcuseInfoModel> get pendingExcuses => _pendingExcuses;
+
   Future<void> getRevisedExcuses(String managerId) async {
     emit(ManagerLoading());
     final result = await managerRepoLocator.getRevisedExcuses(managerId: managerId);
@@ -24,7 +27,10 @@ class ManagerCubit extends Cubit<ManagerState> {
     final result = await managerRepoLocator.getPendingExcuses();
     result.fold(
       (failure) => emit(ManagerError(failure)),
-      (excuses) => emit(ManagerPendingExcusesLoaded(excuses)),
+      (excuses) {
+        _pendingExcuses = excuses;
+        emit(ManagerPendingExcusesLoaded(excuses));
+      },
     );
   }
 
