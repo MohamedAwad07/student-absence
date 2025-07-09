@@ -10,6 +10,7 @@ import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/features/roles/supervisor/data/models/get_excuse_info_model.dart';
 import 'package:student_absence/features/roles/supervisor/presentation/controller/supervisor_cubit/supervisor_cubit.dart';
 import 'package:student_absence/features/roles/supervisor/data/models/update_excuse_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SupervisorExcuseDetailsPage extends StatefulWidget {
   final GetExcuseInfoModel excuse;
@@ -46,6 +47,28 @@ class _SupervisorExcuseDetailsPageState
         updatedAt: DateTime.now(),
       ),
     );
+  }
+
+  void _openUrl(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('الرابط غير صالح')),
+      );
+      return;
+    }
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تعذر فتح الرابط')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تعذر فتح الرابط')),
+      );
+    }
   }
 
   @override
@@ -234,18 +257,54 @@ class _SupervisorExcuseDetailsPageState
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                const Icon(
-                                  Icons.attachment,
-                                  color: AppColors.secondary,
-                                  size: 18,
+                                GestureDetector(
+                                  onTap: () => _openUrl(widget.excuse.fileURL!),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.attachment,
+                                        color: AppColors.secondary,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        widget.excuse.fileURL!.split('/').last,
+                                        style: const TextStyle(
+                                          color: AppColors.secondary,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  widget.excuse.fileURL!.split('/').last,
-                                  style: const TextStyle(
-                                    color: AppColors.secondary,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 13,
+                              ],
+                            ),
+                          ],
+                          if (widget.excuse.imageURL != null) ...[
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () =>
+                                      _openUrl(widget.excuse.imageURL!),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.image,
+                                        color: Colors.green,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        widget.excuse.imageURL!.split('/').last,
+                                        style: const TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],

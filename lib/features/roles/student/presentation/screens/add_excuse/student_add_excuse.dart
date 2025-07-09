@@ -9,6 +9,7 @@ import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
 import 'package:student_absence/features/roles/student/data/models/excuse.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:student_absence/core/utils/image_picker.dart';
 
 class StudentAddExcusePage extends StatefulWidget {
   const StudentAddExcusePage({super.key});
@@ -23,6 +24,55 @@ class _StudentAddExcusePageState extends State<StudentAddExcusePage> {
   final TextEditingController reasonController = TextEditingController();
   String? excuseType;
   bool agreed = false;
+
+  String? fileURL;
+  String? imageURL;
+  bool fileUploading = false;
+  bool imageUploading = false;
+
+  final AssetsPickerHelper _pickerHelper = AssetsPickerHelper();
+
+  Future<void> _pickImage() async {
+    setState(() => imageUploading = true);
+    final url = await _pickerHelper.pickImageFromGallery();
+    setState(() {
+      imageUploading = false;
+      if (url != null) {
+        imageURL = url;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('فشل رفع الصورة. حاول مرة أخرى.')),
+        );
+      }
+    });
+  }
+
+  Future<void> _pickPdf() async {
+    setState(() => fileUploading = true);
+    final url = await _pickerHelper.pickPdfFromGallery();
+    setState(() {
+      fileUploading = false;
+      if (url != null) {
+        fileURL = url;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('فشل رفع ملف PDF. حاول مرة أخرى.')),
+        );
+      }
+    });
+  }
+
+  void _deleteImage() {
+    setState(() {
+      imageURL = null;
+    });
+  }
+
+  void _deletePdf() {
+    setState(() {
+      fileURL = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +229,74 @@ class _StudentAddExcusePageState extends State<StudentAddExcusePage> {
                         style: TextStyle(color: Colors.black54, fontSize: 12),
                       ),
                       const SizedBox(height: 10),
-                      const _FileUploadDemo(),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: (imageUploading || imageURL != null)
+                                  ? null
+                                  : _pickImage,
+                              icon: imageUploading
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Icon(Icons.image),
+                              label: const Text('إرفاق صورة'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: (fileUploading || fileURL != null)
+                                  ? null
+                                  : _pickPdf,
+                              icon: fileUploading
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Icon(Icons.picture_as_pdf),
+                              label: const Text('إرفاق PDF'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.secondary,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      if (imageURL != null)
+                        _FileChip(
+                          fileName: imageURL!.split('/').last,
+                          color: Colors.green,
+                          onDelete: _deleteImage,
+                        ),
+                      if (fileURL != null)
+                        _FileChip(
+                          fileName: fileURL!.split('/').last,
+                          color: AppColors.secondary,
+                          onDelete: _deletePdf,
+                        ),
                       const SizedBox(height: 18),
                       Row(
                         children: [
@@ -226,9 +343,8 @@ class _StudentAddExcusePageState extends State<StudentAddExcusePage> {
                                               reason: reasonController.text,
                                               status: 'قيد المراجعة',
                                               type: excuseType ?? 'أخري',
-                                              fileURL:
-                                                  null, // Add file logic if needed
-                                              imageURL: null,
+                                              fileURL: fileURL,
+                                              imageURL: imageURL,
                                               supervisorId: null,
                                               supervisorComment: null,
                                               managerId: null,
@@ -294,79 +410,11 @@ class _LabeledField extends StatelessWidget {
     );
   }
 }
-
-class _FileUploadDemo extends StatelessWidget {
-  const _FileUploadDemo();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Upload area
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 18),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.grey.shade400,
-              style: BorderStyle.solid,
-            ),
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.grey.shade100,
-          ),
-          child: Column(
-            children: [
-              const Icon(
-                Icons.cloud_upload,
-                color: AppColors.primary,
-                size: 32,
-              ),
-              const SizedBox(height: 8),
-              const Text('اسحب الملفات هنا أو', style: TextStyle(fontSize: 13)),
-              const SizedBox(height: 4),
-              ElevatedButton(
-                onPressed: imagePickerLocator.pickImageFromGallery,
-                style: const ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(AppColors.primary),
-                  foregroundColor: WidgetStatePropertyAll(Colors.white),
-                  padding: WidgetStatePropertyAll(
-                    EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                  ),
-                  shape: WidgetStatePropertyAll(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
-                    ),
-                  ),
-                ),
-                child: const Text('اختر ملف'),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'يسمح برفع ملفات (JPG, PNG, PDF) بحد أقصى 5 ميجا',
-                style: TextStyle(fontSize: 11, color: Colors.black54),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        // Static file chips
-        const _FileChip(
-          fileName: 'آدم_تقرير_طبي.pdf',
-          color: AppColors.secondary,
-        ),
-        const _FileChip(
-          fileName: 'wow_صورة_الإجازة_المرضية.png',
-          color: Colors.green,
-        ),
-      ],
-    );
-  }
-}
-
 class _FileChip extends StatelessWidget {
   final String fileName;
   final Color color;
-  const _FileChip({required this.fileName, required this.color});
+  final VoidCallback? onDelete;
+  const _FileChip({required this.fileName, required this.color, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -392,7 +440,10 @@ class _FileChip extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Icon(Icons.close, color: color, size: 18),
+          GestureDetector(
+            onTap: onDelete,
+            child: Icon(Icons.close, color: color, size: 18),
+          ),
         ],
       ),
     );

@@ -10,6 +10,7 @@ import 'package:student_absence/features/roles/supervisor/data/models/get_excuse
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:student_absence/features/roles/manager/data/models/update_excuse_manager.dart';
 import 'package:student_absence/features/roles/manager/presentation/controller/manager_cubit/manager_cubit.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ManagerExcuseDetails extends StatefulWidget {
   final GetExcuseInfoModel excuse;
@@ -22,6 +23,31 @@ class ManagerExcuseDetails extends StatefulWidget {
 class _ManagerExcuseDetailsState extends State<ManagerExcuseDetails> {
   final TextEditingController _commentController = TextEditingController();
   String? _decision;
+
+  void _openUrl(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('الرابط غير صالح')));
+      return;
+    }
+    try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('تعذر فتح الرابط')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تعذر فتح الرابط')));
+    }
+  }
 
   @override
   void dispose() {
@@ -212,7 +238,8 @@ class _ManagerExcuseDetailsState extends State<ManagerExcuseDetails> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         if (widget.excuse.fileURL != null)
                           ElevatedButton.icon(
@@ -228,7 +255,9 @@ class _ManagerExcuseDetailsState extends State<ManagerExcuseDetails> {
                                 vertical: 8,
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              _openUrl(widget.excuse.fileURL!);
+                            },
                             icon: const Icon(
                               Icons.picture_as_pdf,
                               color: AppColors.primary,
@@ -258,7 +287,9 @@ class _ManagerExcuseDetailsState extends State<ManagerExcuseDetails> {
                                   vertical: 8,
                                 ),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                _openUrl(widget.excuse.imageURL!);
+                              },
                               icon: const Icon(
                                 Icons.image,
                                 color: AppColors.primary,
@@ -289,6 +320,7 @@ class _ManagerExcuseDetailsState extends State<ManagerExcuseDetails> {
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 12, left: 12),
                       decoration: BoxDecoration(
                         color: AppColors.containerBackground2Pink,
                         borderRadius: BorderRadius.circular(8),
@@ -360,22 +392,25 @@ class _ManagerExcuseDetailsState extends State<ManagerExcuseDetails> {
                       style: TextStyle(fontSize: 13, color: Colors.black87),
                     ),
                     const SizedBox(height: 4),
-                    TextField(
-                      controller: _commentController,
-                      minLines: 2,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        hintText: 'أضف ملاحظات هنا ...',
-                        hintStyle: const TextStyle(
-                          fontSize: 13,
-                          color: Colors.black38,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12.0),
+                      child: TextField(
+                        controller: _commentController,
+                        minLines: 2,
+                        maxLines: 4,
+                        decoration: InputDecoration(
+                          hintText: 'أضف ملاحظات هنا ...',
+                          hintStyle: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.black38,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
                         ),
                       ),
                     ),
@@ -385,31 +420,36 @@ class _ManagerExcuseDetailsState extends State<ManagerExcuseDetails> {
                       child: BlocBuilder<ManagerCubit, ManagerState>(
                         builder: (context, state) {
                           final isLoading = state is ManagerLoading;
-                          return ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              onPressed: isLoading ? null : _onConfirm,
+                              child: isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text(
+                                      'تأكيد القرار',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                             ),
-                            onPressed: isLoading ? null : _onConfirm,
-                            child: isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Text(
-                                    'تأكيد القرار',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      color: Colors.white,
-                                    ),
-                                  ),
                           );
                         },
                       ),
