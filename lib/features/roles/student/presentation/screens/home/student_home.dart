@@ -176,22 +176,27 @@ class StudentHomePage extends StatelessWidget {
                         return Skeletonizer(
                           enabled: true,
                           child: Column(
-                            children: List.generate(3, (index) => Card(
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                              child: ListTile(
-                                leading: const Icon(Icons.description),
-                                title: const Text('عنوان العذر'),
-                                subtitle: const Text('تاريخ التقديم: 2023-01-01'),
-                                trailing: Container(
-                                  width: 48,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(8),
+                            children: List.generate(
+                              3,
+                              (index) => Card(
+                                margin: const EdgeInsets.symmetric(vertical: 4),
+                                child: ListTile(
+                                  leading: const Icon(Icons.description),
+                                  title: const Text('عنوان العذر'),
+                                  subtitle: const Text(
+                                    'تاريخ التقديم: 2023-01-01',
+                                  ),
+                                  trailing: Container(
+                                    width: 48,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade200,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
                                 ),
                               ),
-                            )),
+                            ),
                           ),
                         );
                       } else if (state is StudentError) {

@@ -5,9 +5,22 @@ import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:student_absence/core/utils/nav_bar_cubit.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
+import 'package:student_absence/features/roles/supervisor/presentation/controller/supervisor_cubit/supervisor_cubit.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
-class SupervisorHomePage extends StatelessWidget {
+class SupervisorHomePage extends StatefulWidget {
   const SupervisorHomePage({super.key});
+
+  @override
+  State<SupervisorHomePage> createState() => _SupervisorHomePageState();
+}
+
+class _SupervisorHomePageState extends State<SupervisorHomePage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<SupervisorCubit>().getPendingExcuses();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +31,7 @@ class SupervisorHomePage extends StatelessWidget {
           StudentHomeAppBar(
             profileOnPressed: () {
               context.go(AppRoutes.supervisorProfilePage);
-              context.read<NavBarCubit>().setTab(3);
+              context.read<NavBarCubit>().setTab(4);
             },
           ),
           SliverToBoxAdapter(
@@ -53,119 +66,193 @@ class SupervisorHomePage extends StatelessWidget {
 }
 
 class _ReviewedExcuseList extends StatelessWidget {
-  final List<Map<String, String>> excuses = const [
-    {
-      'name': 'أحمد محمد السلام',
-      'studentId': '4391052',
-      'type': 'سفر',
-      'status': 'مقبول',
-      'date': '15 صفر 1445',
-      'note': '',
-    },
-    {
-      'name': 'أحمد محمد السلام',
-      'studentId': '4391052',
-      'type': 'برنامج دراسي',
-      'status': 'قيد المراجعة',
-      'date': '13 صفر 1445',
-      'note': '',
-    },
-    {
-      'name': 'أحمد محمد السلام',
-      'studentId': '4391052',
-      'type': 'مرضية',
-      'status': 'مرفوض',
-      'date': '12 صفر 1445',
-      'note': '',
-    },
-  ];
-
-  Color _statusColor(String status) {
-    switch (status) {
-      case 'مقبول':
-        return AppColors.primary;
-      case 'قيد المراجعة':
-        return AppColors.secondary;
-      case 'مرفوض':
-        return const Color(0xFFF44336);
-      default:
-        return Colors.grey;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: excuses.map((excuse) {
-        return Container(
-          margin: const EdgeInsets.symmetric(vertical: 6),
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return BlocBuilder<SupervisorCubit, SupervisorState>(
+      builder: (context, state) {
+        if (state is SupervisorLoading) {
+          return Skeletonizer(
+            enabled: true,
+            child: Column(
+              children: List.generate(3, (index) => _ExcuseSkeletonCard()),
+            ),
+          );
+        } else if (state is SupervisorPendingExcusesLoaded) {
+          final excuses = state.excuses;
+          if (excuses.isEmpty) {
+            return const Center(child: Text('لا توجد أعذار حالياً'));
+          }
+          return Column(
+            children: excuses.map((excuse) {
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          excuse.studentName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const Spacer(),
+                        _StatusChip(
+                          status: excuse.status,
+                          color: _statusColor(excuse.status),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'رقم الطالب: ${excuse.studentAcademicNumber}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'نوع العذر: ${excuse.type}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'تاريخ التقديم: ${excuse.createdAt.toString().split(' ')[0]}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 4,
+                          ),
+                        ),
+                        onPressed: () {
+                          context.go(
+                            AppRoutes.supervisorExcuseDetails,
+                            extra: excuse,
+                          );
+                          context.read<NavBarCubit>().setTab(1);
+                        },
+                        child: const Text(
+                          'عرض التفاصيل',
+                          style: TextStyle(fontSize: 13, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          );
+        } else if (state is SupervisorError) {
+          return Center(child: Text(state.failure.message));
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
+    );
+  }
+}
+
+class _ExcuseSkeletonCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Text(
-                    excuse['name']!,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                  const Spacer(),
-                  _StatusChip(
-                    status: excuse['status']!,
-                    color: _statusColor(excuse['status']!),
-                  ),
-                ],
+              Skeleton.leaf(
+                child: Container(
+                  width: 100,
+                  height: 18,
+                  color: Colors.grey[300],
+                ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                'رقم الطالب: ${excuse['studentId']!}',
-                style: const TextStyle(fontSize: 13, color: Colors.black54),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                'نوع العذر: ${excuse['type']!}',
-                style: const TextStyle(fontSize: 13, color: Colors.black54),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                'تاريخ التقديم: ${excuse['date']!}',
-                style: const TextStyle(fontSize: 13, color: Colors.black54),
-              ),
-              const SizedBox(height: 6),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 4,
-                    ),
-                  ),
-                  onPressed: () {
-                    context.go(AppRoutes.supervisorExcuseDetails);
-                  },
-                  child: const Text(
-                    'عرض التفاصيل',
-                    style: TextStyle(fontSize: 13, color: Colors.white),
-                  ),
+              const Spacer(),
+              Skeleton.leaf(
+                child: Container(
+                  width: 60,
+                  height: 18,
+                  color: Colors.grey[300],
                 ),
               ),
             ],
           ),
-        );
-      }).toList(),
+          const SizedBox(height: 2),
+          Skeleton.leaf(
+            child: Container(width: 120, height: 14, color: Colors.grey[300]),
+          ),
+          const SizedBox(height: 2),
+          Skeleton.leaf(
+            child: Container(width: 100, height: 14, color: Colors.grey[300]),
+          ),
+          const SizedBox(height: 2),
+          Skeleton.leaf(
+            child: Container(width: 140, height: 14, color: Colors.grey[300]),
+          ),
+          const SizedBox(height: 6),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Skeleton.leaf(
+              child: Container(
+                width: 80,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(18),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
+  }
+}
+
+Color _statusColor(String status) {
+  switch (status) {
+    case 'مقبول':
+      return AppColors.primary;
+    case 'قيد المراجعة':
+      return AppColors.secondary;
+    case 'مرفوض':
+      return const Color(0xFFF44336);
+    default:
+      return Colors.grey;
   }
 }
 

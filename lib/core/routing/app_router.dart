@@ -20,6 +20,7 @@ import 'package:student_absence/features/roles/student/presentation/screens/noti
 import 'package:student_absence/features/roles/student/presentation/screens/profile/student_profile.dart';
 import 'package:student_absence/features/roles/student/presentation/screens/track_excuses/student_track_excuses.dart';
 import 'package:student_absence/features/roles/student/presentation/student_bottom_nav_bar.dart';
+import 'package:student_absence/features/roles/supervisor/presentation/controller/supervisor_cubit/supervisor_cubit.dart';
 import 'package:student_absence/features/roles/supervisor/presentation/screens/excuse_details/supervisor_excuse_details.dart';
 import 'package:student_absence/features/roles/supervisor/presentation/screens/home/supervisor_home.dart';
 import 'package:student_absence/features/roles/supervisor/presentation/screens/notifications/supervisor_notifications.dart';
@@ -30,6 +31,7 @@ import 'package:student_absence/features/splash/splash_screen.dart';
 import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
+import 'package:student_absence/features/roles/supervisor/data/models/get_excuse_info_model.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -254,12 +256,8 @@ GoRouter createAppRouter(AuthCubit authCubit) {
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) => MultiBlocProvider(
           providers: [
-            // BlocProvider<SupervisorCubit>(
-            //   create: (_) =>
-            //       SupervisorCubit()
-            //         ..getExcuses(FirebaseAuth.instance.currentUser!.uid),
-            // ),
-           BlocProvider<NavBarCubit>(create: (_) => NavBarCubit()),
+            BlocProvider<SupervisorCubit>(create: (_) => SupervisorCubit()),
+            BlocProvider<NavBarCubit>(create: (_) => NavBarCubit()),
           ],
           child: SupervisorBottomNavBar(child: child),
         ),
@@ -287,19 +285,38 @@ GoRouter createAppRouter(AuthCubit authCubit) {
             path: AppRoutes.supervisorExcuseDetails,
             parentNavigatorKey: _shellNavigatorKey,
             pageBuilder: (context, state) {
-              return CustomTransitionPage(
-                key: state.pageKey,
-                child: const SupervisorExcuseDetailsPage(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                      return FadeTransition(
-                        opacity: CurveTween(
-                          curve: Curves.easeInQuad,
-                        ).animate(animation),
-                        child: child,
-                      );
-                    },
-              );
+              final extra = state.extra;
+              if (extra is GetExcuseInfoModel) {
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: SupervisorExcuseDetailsPage(excuse: extra),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(
+                          opacity: CurveTween(
+                            curve: Curves.easeInQuad,
+                          ).animate(animation),
+                          child: child,
+                        );
+                      },
+                );
+              } else {
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: const Scaffold(
+                    body: Center(child: Text('لا يوجد عذر لعرض تفاصيله')),
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(
+                          opacity: CurveTween(
+                            curve: Curves.easeInQuad,
+                          ).animate(animation),
+                          child: child,
+                        );
+                      },
+                );
+              }
             },
           ),
           GoRoute(

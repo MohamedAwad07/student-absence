@@ -8,6 +8,7 @@ import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:student_absence/core/utils/nav_bar_cubit.dart';
+import 'package:student_absence/features/roles/supervisor/presentation/controller/supervisor_cubit/supervisor_cubit.dart';
 
 class SupervisorBottomNavBar extends StatelessWidget {
   const SupervisorBottomNavBar({super.key, required this.child});
@@ -68,7 +69,18 @@ class SupervisorBottomNavBar extends StatelessWidget {
         cubit.setTab(0);
         break;
       case 1:
-        context.go(AppRoutes.supervisorExcuseDetails);
+        final supervisorState = context.read<SupervisorCubit>().state;
+        if (supervisorState is SupervisorPendingExcusesLoaded && supervisorState.excuses.isNotEmpty) {
+          context.go(
+            AppRoutes.supervisorExcuseDetails,
+            extra: supervisorState.excuses.first,
+          );
+        } else {
+          context.go(
+            AppRoutes.supervisorExcuseDetails,
+            extra: null,
+          );
+        }
         cubit.setTab(1);
         break;
       case 2:

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
+import 'package:student_absence/features/roles/supervisor/data/models/get_excuse_info_model.dart';
 
 class SupervisorExcuseDetailsPage extends StatelessWidget {
-  const SupervisorExcuseDetailsPage({super.key});
+  final GetExcuseInfoModel excuse;
+  const SupervisorExcuseDetailsPage({super.key, required this.excuse});
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +61,10 @@ class SupervisorExcuseDetailsPage extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'معلومات الطالب',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -70,11 +72,11 @@ class SupervisorExcuseDetailsPage extends StatelessWidget {
                                 color: AppColors.primary,
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                CircleAvatar(
+                                const CircleAvatar(
                                   radius: 18,
                                   backgroundColor: AppColors.primary,
                                   child: Icon(
@@ -83,28 +85,20 @@ class SupervisorExcuseDetailsPage extends StatelessWidget {
                                     size: 22,
                                   ),
                                 ),
-                                SizedBox(width: 8),
+                                const SizedBox(width: 8),
                                 Column(
-                                  spacing: 4,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'أحمد محمد العطاس',
-                                      style: TextStyle(
+                                      excuse.studentName,
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13,
                                       ),
                                     ),
                                     Text(
-                                      'رقم الطالب: 4931052',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
-                                    Text(
-                                      'الشعبة: 4',
-                                      style: TextStyle(
+                                      'رقم الطالب: ${excuse.studentAcademicNumber}',
+                                      style: const TextStyle(
                                         fontSize: 12,
                                         color: Colors.black54,
                                       ),
@@ -125,9 +119,9 @@ class SupervisorExcuseDetailsPage extends StatelessWidget {
                             color: AppColors.secondary.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Text(
-                            'قيد المراجعة',
-                            style: TextStyle(
+                          child: Text(
+                            excuse.status,
+                            style: const TextStyle(
                               color: AppColors.secondary,
                               fontWeight: FontWeight.bold,
                             ),
@@ -148,52 +142,54 @@ class SupervisorExcuseDetailsPage extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
                             Text(
-                              'عذر طبي',
-                              style: TextStyle(
+                              excuse.type,
+                              style: const TextStyle(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Spacer(),
+                            const Spacer(),
                             Text(
-                              '2023-07-01',
-                              style: TextStyle(
+                              excuse.createdAt.toString().split(' ')[0],
+                              style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.black54,
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          'سبب العذر: بسبب المرض تم التوصية من الطبيب الاستشاري لعدم حضور أيام ورفع تقارير طبية وبعد الشفاء العودة للدراسة.',
-                          style: TextStyle(fontSize: 13),
+                          'سبب العذر: ${excuse.reason}',
+                          style: const TextStyle(fontSize: 13),
                         ),
-                        SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.attachment,
-                              color: AppColors.secondary,
-                              size: 18,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              'تقرير طبي.pdf',
-                              style: TextStyle(
+                        if (excuse.fileURL != null) ...[
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.attachment,
                                 color: AppColors.secondary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
+                                size: 18,
                               ),
-                            ),
-                          ],
-                        ),
+                              const SizedBox(width: 4),
+                              Text(
+                                excuse.fileURL!.split('/').last,
+                                style: const TextStyle(
+                                  color: AppColors.secondary,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ],
                     ),
                   ),

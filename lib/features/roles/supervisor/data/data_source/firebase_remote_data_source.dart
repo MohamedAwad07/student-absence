@@ -34,7 +34,7 @@ class SupervisorFirebaseRemoteDataSource implements SupervisorRepo {
         if (studentData != null) {
           final model = GetExcuseInfoModel(
             studentId: studentId,
-            studentName: studentData['username'] ?? '',
+            studentName: studentData['username'],
             studentAcademicNumber: studentData['academicNumber'] ?? '',
             status: excuseData['status'] ?? '',
             reason: excuseData['reason'] ?? '',
@@ -78,7 +78,7 @@ class SupervisorFirebaseRemoteDataSource implements SupervisorRepo {
         if (studentData != null) {
           final model = GetExcuseInfoModel(
             studentId: studentId,
-            studentName: studentData['name'] ?? '',
+            studentName: studentData['username'] ?? '',
             studentAcademicNumber: studentData['academicNumber'] ?? '',
             status: excuseData['status'] ?? '',
             reason: excuseData['reason'] ?? '',
