@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StudentNotifications extends StatelessWidget {
   const StudentNotifications({super.key});
@@ -42,7 +44,9 @@ class StudentNotifications extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   // Notifications List
-                  _NotificationList(),
+                  NotificationList(
+                    userId: FirebaseAuth.instance.currentUser!.uid,
+                  ),
                   const SizedBox(height: 24),
                   // Show More Button
                   Center(
@@ -73,146 +77,99 @@ class StudentNotifications extends StatelessWidget {
   }
 }
 
-class _NotificationList extends StatelessWidget {
-  final List<Map<String, dynamic>> notifications = const [
-    {
-      'status': 'accepted',
-      'title': 'تم قبول العذر',
-      'desc': 'تم قبول عذر غياب بتاريخ 15 صفر 1445',
-      'user': 'م. محمد نصيري',
-      'date': 'منذ ساعتين',
-      'action': 'عرض التفاصيل',
-    },
-    {
-      'status': 'rejected',
-      'title': 'تم رفض العذر',
-      'desc': 'تم رفض عذر غياب بسبب عدم كفاية الأدلة المقدمة',
-      'user': 'م. لؤي مسلم',
-      'date': 'أمس 20:15',
-      'action': 'عرض التفاصيل',
-    },
-  ];
+class NotificationList extends StatelessWidget {
+  final String userId;
+  const NotificationList({required this.userId, super.key});
 
-  Color _statusColor(String status) {
-    switch (status) {
-      case 'accepted':
-        return AppColors.secondary;
-      case 'rejected':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
+  String _formatDate(Timestamp? timestamp) {
+    if (timestamp == null) return '';
+    final date = timestamp.toDate();
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year.toString();
+    return '$day/$month/$year';
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: notifications.map((notif) {
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('notifications')
+          .where('userId', isEqualTo: userId)
+          .orderBy('createdAt', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text('لا توجد إشعارات حالياً'));
+        }
+        final notifications = snapshot.data!.docs;
+        return Column(
+          children: notifications.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        notif['title'],
-                        style: TextStyle(
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
+                    margin: const EdgeInsets.only(top: 36, left: 4, right: 8),
+                    decoration: const BoxDecoration(
+                      color: AppColors.secondary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Expanded(
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      title: Text(
+                        data['title'] ?? '',
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: notif['status'] == 'rejected'
-                              ? Colors.red
-                              : AppColors.primary,
+                          color: AppColors.primary,
                           fontSize: 15,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        notif['desc'],
+                      subtitle: Text(
+                        data['body'] ?? '',
                         style: const TextStyle(
                           fontSize: 13,
                           color: Colors.black87,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Text(
-                            notif['user'],
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            notif['date'],
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            minimumSize: const Size(0, 0),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: Text(
-                            notif['action'],
-                            style: TextStyle(
-                              color: notif['status'] == 'rejected'
-                                  ? Colors.red
-                                  : AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
-                          ),
+                      trailing: Text(
+                        _formatDate(data['createdAt'] as Timestamp?),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black54,
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-              // Status Bar
-              Container(
-                width: 6,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: _statusColor(notif['status']),
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(12),
-                    bottomRight: Radius.circular(12),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 }

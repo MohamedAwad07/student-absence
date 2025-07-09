@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:student_absence/core/service%20locator/di.dart';
 import 'package:student_absence/features/roles/student/data/models/excuse.dart';
@@ -14,6 +15,19 @@ class StudentFirebaseRemoteDataSource implements StudentRepo {
       await _excusesCollection
           .doc(excuseModel.excuseId)
           .set(excuseModel.toFirestore());
+
+      // Fetch all supervisor user IDs
+      final supervisorIds = await getAllSupervisorUserIds();
+
+      // Send notification to each supervisor
+      for (final supervisorId in supervisorIds) {
+        await NotificationServiceTest.sendNotification(
+          userId: supervisorId,
+          title: 'عذر جديد ',
+          body: 'تم إضافة عذر جديد من طالب',
+        );
+      }
+
       return const Right('Excuse submitted successfully');
     } catch (e) {
       return Left(Failure('Failed to submit excuse', code: e.toString()));
@@ -54,5 +68,30 @@ class StudentFirebaseRemoteDataSource implements StudentRepo {
     } catch (e) {
       return Left(Failure('Failed to get excuses', code: e.toString()));
     }
+  }
+
+  // Helper method to fetch all supervisor user IDs
+  Future<List<String>> getAllSupervisorUserIds() async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('role', isEqualTo: 'supervisor')
+        .get();
+    return querySnapshot.docs.map((doc) => doc.id).toList();
+  }
+}
+
+class NotificationServiceTest {
+  static Future<void> sendNotification({
+    required String userId,
+    required String title,
+    required String body,
+  }) async {
+    await FirebaseFirestore.instance.collection('notifications').add({
+      'userId': userId,
+      'title': title,
+      'body': body,
+      'createdAt': FieldValue.serverTimestamp(),
+      'isRead': false,
+    });
   }
 }

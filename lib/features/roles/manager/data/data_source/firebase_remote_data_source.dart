@@ -5,6 +5,7 @@ import 'package:student_absence/features/roles/manager/data/models/update_excuse
 import 'package:student_absence/features/roles/manager/data/repos/repo.dart';
 import 'package:student_absence/features/roles/student/data/repos/repo.dart';
 import 'package:student_absence/features/roles/supervisor/data/models/get_excuse_info_model.dart';
+import 'package:student_absence/features/roles/student/data/data_source/remote_data_source.dart';
 
 class ManagerFirebaseRemoteDataSource implements ManagerRepo {
   final _excusesCollection = firestoreLocator.collection('excuses');
@@ -115,9 +116,29 @@ class ManagerFirebaseRemoteDataSource implements ManagerRepo {
           .doc(excuseId)
           .update(managerUpdateExcuseModel.toFirestore());
 
+      // Fetch the studentId associated with this excuse
+      final studentId = await getStudentIdForExcuse(excuseId);
+      if (studentId != null) {
+        // Notify the student
+        await NotificationServiceTest.sendNotification(
+          userId: studentId,
+          title: 'تم تحديث حالة العذر',
+          body: 'تم تحديث حالة العذر الخاص بك من قبل الإدارة.',
+        );
+      }
+
       return const Right('تم تحديث حالة العذر بنجاح');
     } catch (e) {
       return Left(Failure('فشل في تحديث حالة العذر', code: e.toString()));
     }
+  }
+
+  // Helper to get studentId for a given excuse
+  Future<String?> getStudentIdForExcuse(String excuseId) async {
+    final doc = await _excusesCollection.doc(excuseId).get();
+    if (doc.exists) {
+      return doc.data()?['studentId'] as String?;
+    }
+    return null;
   }
 }

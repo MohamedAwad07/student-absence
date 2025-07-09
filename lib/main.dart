@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:student_absence/core/routing/app_router.dart';
@@ -13,11 +15,15 @@ import 'package:student_absence/firebase_options.dart';
 import 'package:flutter/services.dart';
 import 'core/service locator/di.dart';
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   Bloc.observer = Observe();
   await dotenv.load(fileName: ".env");
+  await FirebaseMessaging.instance.requestPermission();
+
   setUp();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(

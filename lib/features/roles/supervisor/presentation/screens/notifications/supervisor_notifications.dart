@@ -3,12 +3,15 @@ import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SupervisorNotifications extends StatelessWidget {
   const SupervisorNotifications({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
@@ -49,7 +52,7 @@ class SupervisorNotifications extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   // Notifications List
-                  _SupervisorNotificationList(),
+                  NotificationList(userId: currentUserId),
                   const SizedBox(height: 32),
                   Center(
                     child: OutlinedButton(
@@ -85,147 +88,105 @@ class SupervisorNotifications extends StatelessWidget {
   }
 }
 
-class _SupervisorNotificationList extends StatelessWidget {
-  final List<Map<String, dynamic>> notifications = const [
-    {
-      'status': 'accepted',
-      'title': 'تم قبول العذر',
-      'desc': 'تم قبول عذر الطالب أحمد محمد',
-      'time': 'منذ 10 دقائق',
-      'icon': Icons.check,
-      'color': AppColors.primary,
-      'action': null,
-    },
-    {
-      'status': 'pending',
-      'title': 'عذر جديد بانتظار المراجعة',
-      'desc': 'عذر جديد من الطالب سارة أحمد',
-      'time': 'منذ 30 دقيقة',
-      'icon': Icons.priority_high,
-      'color': AppColors.secondary,
-      'action': 'مراجعة',
-    },
-    {
-      'status': 'rejected',
-      'title': 'تم رفض العذر',
-      'desc': 'تم رفض عذر الطالب محمد علي',
-      'time': 'منذ 3 ساعات',
-      'icon': Icons.percent,
-      'color': Colors.red,
-      'action': null,
-    },
-  ];
+class NotificationList extends StatelessWidget {
+  final String userId;
+  const NotificationList({required this.userId, super.key});
 
-  Color _titleColor(String status) {
-    switch (status) {
-      case 'accepted':
-        return AppColors.primary;
-      case 'pending':
-        return AppColors.secondary;
-      case 'rejected':
-        return Colors.red;
-      default:
-        return Colors.black;
-    }
+  String _formatDate(Timestamp? timestamp) {
+    if (timestamp == null) return '';
+    final date = timestamp.toDate();
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year.toString();
+    return '$day/$month/$year';
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: notifications.map((notif) {
-        return Container(
-          margin: const EdgeInsets.only(top: 6, bottom: 6, right: 16),
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  spacing: 4,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      notif['title'],
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: _titleColor(notif['status']),
-                        fontSize: 15,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      notif['desc'],
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('notifications')
+          .where('userId', isEqualTo: userId)
+          .orderBy('createdAt', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text('لا توجد إشعارات حالياً'));
+        }
+        final notifications = snapshot.data!.docs;
+        return Column(
+          children: notifications.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return Container(
+              margin: const EdgeInsets.only(top: 6, bottom: 6, right: 16),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      spacing: 4,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(
-                          Icons.access_time,
-                          color: Colors.amber,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 2),
                         Text(
-                          notif['time'],
+                          data['title'] ?? '',
                           style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.black54,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                            fontSize: 15,
                           ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          data['body'] ?? '',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.access_time,
+                              color: Colors.amber,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 2),
+                            Text(
+                              _formatDate(data['createdAt'] as Timestamp?),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    if (notif['action'] != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12.0),
-                        child: Center(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 48,
-                                vertical: 12,
-                              ),
-                            ),
-                            onPressed: () {
-                              context.go(AppRoutes.supervisorExcuseDetails);
-                            },
-                            child: Text(
-                              notif['action'],
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 8,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Container(
-                width: 8,
-                height: notif['action'] == null ? 80 : 140,
-                decoration: BoxDecoration(
-                  color: notif['color'],
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ],
-          ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 }
