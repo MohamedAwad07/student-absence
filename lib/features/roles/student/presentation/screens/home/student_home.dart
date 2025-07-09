@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
+import 'package:student_absence/core/utils/nav_bar_cubit.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
 import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
-import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_nav_bar_cubit.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class StudentHomePage extends StatelessWidget {
@@ -22,7 +22,7 @@ class StudentHomePage extends StatelessWidget {
           StudentHomeAppBar(
             profileOnPressed: () {
               context.go(AppRoutes.studentProfilePage);
-              context.read<StudentNavBarCubit>().setTab(4);
+              context.read<NavBarCubit>().setTab(4);
             },
           ),
           SliverToBoxAdapter(
@@ -113,7 +113,7 @@ class StudentHomePage extends StatelessWidget {
                     title: 'ملخص الأعذار',
                     onPressed: () {
                       context.go(AppRoutes.studentTrackExcuses);
-                      context.read<StudentNavBarCubit>().setTab(1);
+                      context.read<NavBarCubit>().setTab(1);
                     },
                   ),
                   const SizedBox(height: 8),
@@ -209,7 +209,7 @@ class StudentHomePage extends StatelessWidget {
                     title: 'الإشعارات',
                     onPressed: () {
                       context.go(AppRoutes.studentNotifications);
-                      context.read<StudentNavBarCubit>().setTab(3);
+                      context.read<NavBarCubit>().setTab(3);
                     },
                   ),
                   const SizedBox(height: 8),
@@ -220,7 +220,7 @@ class StudentHomePage extends StatelessWidget {
                     child: TextButton.icon(
                       onPressed: () {
                         context.go(AppRoutes.studentProfilePage);
-                        context.read<StudentNavBarCubit>().setTab(4);
+                        context.read<NavBarCubit>().setTab(4);
                       },
                       icon: const Icon(
                         Icons.settings,

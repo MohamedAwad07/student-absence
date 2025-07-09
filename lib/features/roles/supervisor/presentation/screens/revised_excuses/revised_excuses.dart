@@ -6,8 +6,8 @@ import 'package:student_absence/core/utils/nav_bar_cubit.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 
-class SupervisorHomePage extends StatelessWidget {
-  const SupervisorHomePage({super.key});
+class SupervisorRevisedExcusesPage extends StatelessWidget {
+  const SupervisorRevisedExcusesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class SupervisorHomePage extends StatelessWidget {
           StudentHomeAppBar(
             profileOnPressed: () {
               context.go(AppRoutes.supervisorProfilePage);
-              context.read<NavBarCubit>().setTab(3);
+              context.read<NavBarCubit>().setTab(4);
             },
           ),
           SliverToBoxAdapter(
@@ -33,7 +33,7 @@ class SupervisorHomePage extends StatelessWidget {
                   const SizedBox(height: 8),
                   // Section Title
                   const Text(
-                    'الأعذار الجديدة',
+                    'الأعذار التي تمت مراجعتها من جهتك',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -66,7 +66,7 @@ class _ReviewedExcuseList extends StatelessWidget {
       'name': 'أحمد محمد السلام',
       'studentId': '4391052',
       'type': 'برنامج دراسي',
-      'status': 'قيد المراجعة',
+      'status': 'بإنتظار القرار النهائي',
       'date': '13 صفر 1445',
       'note': '',
     },
@@ -84,7 +84,7 @@ class _ReviewedExcuseList extends StatelessWidget {
     switch (status) {
       case 'مقبول':
         return AppColors.primary;
-      case 'قيد المراجعة':
+      case 'بإنتظار القرار النهائي':
         return AppColors.secondary;
       case 'مرفوض':
         return const Color(0xFFF44336);
@@ -104,10 +104,10 @@ class _ReviewedExcuseList extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     excuse['name']!,
@@ -116,50 +116,27 @@ class _ReviewedExcuseList extends StatelessWidget {
                       fontSize: 15,
                     ),
                   ),
-                  const Spacer(),
-                  _StatusChip(
-                    status: excuse['status']!,
-                    color: _statusColor(excuse['status']!),
+                  const SizedBox(height: 2),
+                  Text(
+                    'رقم الطالب: ${excuse['studentId']!}',
+                    style: const TextStyle(fontSize: 13, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'نوع العذر: ${excuse['type']!}',
+                    style: const TextStyle(fontSize: 13, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'تاريخ التقديم: ${excuse['date']!}',
+                    style: const TextStyle(fontSize: 13, color: Colors.black54),
                   ),
                 ],
               ),
-              const SizedBox(height: 2),
-              Text(
-                'رقم الطالب: ${excuse['studentId']!}',
-                style: const TextStyle(fontSize: 13, color: Colors.black54),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                'نوع العذر: ${excuse['type']!}',
-                style: const TextStyle(fontSize: 13, color: Colors.black54),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                'تاريخ التقديم: ${excuse['date']!}',
-                style: const TextStyle(fontSize: 13, color: Colors.black54),
-              ),
-              const SizedBox(height: 6),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 4,
-                    ),
-                  ),
-                  onPressed: () {
-                    context.go(AppRoutes.supervisorExcuseDetails);
-                  },
-                  child: const Text(
-                    'عرض التفاصيل',
-                    style: TextStyle(fontSize: 13, color: Colors.white),
-                  ),
-                ),
+              const Spacer(),
+              _StatusChip(
+                status: excuse['status']!,
+                color: _statusColor(excuse['status']!),
               ),
             ],
           ),
@@ -177,19 +154,14 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: AppColors.secondary.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         status,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
-        ),
+        style: TextStyle(color: color, fontWeight: FontWeight.bold),
       ),
     );
   }

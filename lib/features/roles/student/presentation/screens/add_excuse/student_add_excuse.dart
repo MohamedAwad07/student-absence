@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:student_absence/core/service%20locator/di.dart';
+import 'package:student_absence/core/utils/nav_bar_cubit.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
 import 'package:student_absence/features/roles/student/data/models/excuse.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_nav_bar_cubit.dart';
 
 class StudentAddExcusePage extends StatefulWidget {
   const StudentAddExcusePage({super.key});
@@ -33,7 +33,7 @@ class _StudentAddExcusePageState extends State<StudentAddExcusePage> {
             context,
           ).showSnackBar(SnackBar(content: Text(state.message)));
           context.go(AppRoutes.studentTrackExcuses);
-          context.read<StudentNavBarCubit>().setTab(1);
+          context.read<NavBarCubit>().setTab(1);
         } else if (state is StudentError) {
           ScaffoldMessenger.of(
             context,
@@ -47,7 +47,7 @@ class _StudentAddExcusePageState extends State<StudentAddExcusePage> {
             StudentHomeAppBar(
               profileOnPressed: () {
                 context.go(AppRoutes.studentProfilePage);
-                context.read<StudentNavBarCubit>().setTab(4);
+                context.read<NavBarCubit>().setTab(4);
               },
             ),
             SliverToBoxAdapter(

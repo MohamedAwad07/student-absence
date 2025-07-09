@@ -18,10 +18,11 @@ class StudentCubit extends Cubit<StudentState> {
     final result = await studentRepoLocator.submitExcuse(
       excuseModel: excuseModel,
     );
-    result.fold(
-      (failure) => emit(StudentError(failure.message)),
-      (message) => emit(StudentExcuseSubmitted(message)),
-    );
+    result.fold((failure) => emit(StudentError(failure.message)), (message) {
+      emit(StudentExcuseSubmitted(message));
+      excuses.clear();
+      getExcuses(FirebaseAuth.instance.currentUser!.uid);
+    });
   }
 
   // Get status of a specific excuse

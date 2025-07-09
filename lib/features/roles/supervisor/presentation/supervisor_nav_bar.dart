@@ -1,87 +1,87 @@
 // ignore_for_file: depend_on_referenced_packages
 
+import 'package:awesome_bottom_bar/awesome_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:student_absence/core/utils/nav_bar_cubit.dart';
 
-class SupervisorBottomNavBar extends StatefulWidget {
+class SupervisorBottomNavBar extends StatelessWidget {
   const SupervisorBottomNavBar({super.key, required this.child});
   final Widget child;
   @override
-  State<SupervisorBottomNavBar> createState() => _SupervisorBottomNavBarState();
-}
-
-class _SupervisorBottomNavBarState extends State<SupervisorBottomNavBar> {
-  int selectedIndex = 0;
-  @override
   Widget build(BuildContext context) {
+    final List<TabItem> items = [
+      const TabItem(icon: Icons.home_outlined),
+      const TabItem(icon: Icons.file_open_outlined),
+      const TabItem(icon: Icons.check_circle_outline),
+      const TabItem(icon: Icons.notification_important_outlined),
+      const TabItem(icon: Icons.person_2_outlined),
+    ];
+
     return PopScope(
       canPop: false,
       child: Scaffold(
         backgroundColor: AppColors.scaffoldBackground,
-        body: widget.child,
+        body: child,
         bottomNavigationBar: Directionality(
           textDirection: TextDirection.ltr,
-          child: BottomNavigationBar(
-            backgroundColor: AppColors.primary,
-            type: BottomNavigationBarType.fixed,
-            currentIndex: selectedIndex,
-            onTap: (index) => changeTab(index),
-            selectedItemColor: AppColors.secondary,
-            unselectedItemColor: AppColors.white,
-            showUnselectedLabels: false,
-            showSelectedLabels: true,
-            iconSize: 26.0,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                label: 'الرئيسية',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.file_open_outlined),
-                label: 'الأعذار',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.notification_important_outlined),
-                label: 'الأشعارات',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_2_outlined),
-                label: 'حسابي',
-              ),
-            ],
+          child: BlocBuilder<NavBarCubit, int>(
+            builder: (context, selectedIndex) {
+              return BottomBarCreative(
+                items: items,
+                bottom: 5.h,
+                blur: 0,
+                enableShadow: false,
+                iconSize: 30.sp,
+                pad: 0,
+                paddingVertical: 0,
+                backgroundColor: AppColors.primary,
+                color: AppColors.white,
+                colorSelected: AppColors.secondary,
+                indexSelected: selectedIndex,
+                isFloating: true,
+                highlightStyle: const HighlightStyle(
+                  sizeLarge: true,
+                  isHexagon: true,
+                  elevation: 2,
+                ),
+                onTap: (int index) {
+                  _changeTab(context, index);
+                },
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  void changeTab(int index) async {
+  void _changeTab(BuildContext context, int index) {
+    final cubit = context.read<NavBarCubit>();
     switch (index) {
       case 0:
         context.go(AppRoutes.supervisorHome);
-        setState(() {
-          selectedIndex = 0;
-        });
+        cubit.setTab(0);
         break;
       case 1:
         context.go(AppRoutes.supervisorExcuseDetails);
-        setState(() {
-          selectedIndex = 1;
-        });
+        cubit.setTab(1);
         break;
       case 2:
-        context.go(AppRoutes.supervisorNotifications);
-        setState(() {
-          selectedIndex = 2;
-        });
+        context.go(AppRoutes.supervisorRevisedExcuses);
+        cubit.setTab(2);
         break;
       case 3:
+        context.go(AppRoutes.supervisorNotifications);
+        cubit.setTab(3);
+        break;
+      case 4:
         context.go(AppRoutes.supervisorProfilePage);
-        setState(() {
-          selectedIndex = 3;
-        });
+        cubit.setTab(4);
         break;
       default:
         break;

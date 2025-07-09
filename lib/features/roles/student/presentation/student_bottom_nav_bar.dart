@@ -7,7 +7,7 @@ import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_nav_bar_cubit.dart';
+import 'package:student_absence/core/utils/nav_bar_cubit.dart';
 
 class StudentBottomNavBar extends StatelessWidget {
   const StudentBottomNavBar({super.key, required this.child});
@@ -29,7 +29,7 @@ class StudentBottomNavBar extends StatelessWidget {
         body: child,
         bottomNavigationBar: Directionality(
           textDirection: TextDirection.ltr,
-          child: BlocBuilder<StudentNavBarCubit, int>(
+          child: BlocBuilder<NavBarCubit, int>(
             builder: (context, selectedIndex) {
               return BottomBarCreative(
                 items: items,
@@ -61,7 +61,7 @@ class StudentBottomNavBar extends StatelessWidget {
   }
 
   void _changeTab(BuildContext context, int index) {
-    final cubit = context.read<StudentNavBarCubit>();
+    final cubit = context.read<NavBarCubit>();
     switch (index) {
       case 0:
         context.go(AppRoutes.studentHome);

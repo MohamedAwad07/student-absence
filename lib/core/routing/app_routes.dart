@@ -15,6 +15,7 @@ class AppRoutes {
   // supervisor routes
   static const String supervisorHome = '/SupervisorHome';
   static const String supervisorExcuseDetails = '/SupervisorExcuseDetails';
+  static const String supervisorRevisedExcuses = '/SupervisorRevisedExcuses';
   static const String supervisorNotifications = '/SupervisorNotifications';
   static const String supervisorProfilePage = '/SupervisorProfilePage';
 

@@ -3,7 +3,7 @@ import 'package:student_absence/core/service%20locator/di.dart';
 import 'package:student_absence/features/roles/student/data/models/excuse.dart';
 import 'package:student_absence/features/roles/student/data/repos/repo.dart';
 
-class FirebaseRemoteDataSource implements StudentRepo {
+class StudentFirebaseRemoteDataSource implements StudentRepo {
   final _excusesCollection = firestoreLocator.collection('excuses');
 
   @override
