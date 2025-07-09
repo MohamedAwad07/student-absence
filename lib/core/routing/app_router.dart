@@ -1,9 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
 import 'package:student_absence/core/routing/go_router_refresh_stream.dart';
+import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/utils/nav_bar_cubit.dart';
+import 'package:student_absence/core/widgets/app_bar.dart';
+import 'package:student_absence/core/widgets/custom_profile_page.dart';
 import 'package:student_absence/features/auth/login/presentation/login_screen.dart';
 import 'package:student_absence/features/auth/login/presentation/login_welcome.dart';
 import 'package:student_absence/features/auth/presentation/auth_gate.dart';
@@ -12,19 +14,16 @@ import 'package:student_absence/features/roles/manager/presentation/manager_bott
 import 'package:student_absence/features/roles/manager/presentation/screens/excuse_details/manager_excuse_details.dart';
 import 'package:student_absence/features/roles/manager/presentation/screens/home/manager_home.dart';
 import 'package:student_absence/features/roles/manager/presentation/screens/notifications/manager_notifications.dart';
-import 'package:student_absence/features/roles/manager/presentation/screens/profile/manager_profile.dart';
 import 'package:student_absence/features/roles/manager/presentation/screens/revised_excuses/manager_revised_excuses.dart';
 import 'package:student_absence/features/roles/student/presentation/screens/add_excuse/student_add_excuse.dart';
 import 'package:student_absence/features/roles/student/presentation/screens/home/student_home.dart';
 import 'package:student_absence/features/roles/student/presentation/screens/notifications/student_notifications.dart';
-import 'package:student_absence/features/roles/student/presentation/screens/profile/student_profile.dart';
 import 'package:student_absence/features/roles/student/presentation/screens/track_excuses/student_track_excuses.dart';
 import 'package:student_absence/features/roles/student/presentation/student_bottom_nav_bar.dart';
 import 'package:student_absence/features/roles/supervisor/presentation/controller/supervisor_cubit/supervisor_cubit.dart';
 import 'package:student_absence/features/roles/supervisor/presentation/screens/excuse_details/supervisor_excuse_details.dart';
 import 'package:student_absence/features/roles/supervisor/presentation/screens/home/supervisor_home.dart';
 import 'package:student_absence/features/roles/supervisor/presentation/screens/notifications/supervisor_notifications.dart';
-import 'package:student_absence/features/roles/supervisor/presentation/screens/profile/supervisor_profile.dart';
 import 'package:student_absence/features/roles/supervisor/presentation/screens/revised_excuses/revised_excuses.dart';
 import 'package:student_absence/features/roles/supervisor/presentation/supervisor_nav_bar.dart';
 import 'package:student_absence/features/splash/splash_screen.dart';
@@ -144,11 +143,7 @@ GoRouter createAppRouter(AuthCubit authCubit) {
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) => MultiBlocProvider(
           providers: [
-            BlocProvider<StudentCubit>(
-              create: (_) =>
-                  StudentCubit()
-                    ..getExcuses(FirebaseAuth.instance.currentUser!.uid),
-            ),
+            BlocProvider<StudentCubit>(create: (_) => StudentCubit()),
             BlocProvider<NavBarCubit>(create: (_) => NavBarCubit()),
           ],
           child: StudentBottomNavBar(child: child),
@@ -235,7 +230,7 @@ GoRouter createAppRouter(AuthCubit authCubit) {
             pageBuilder: (context, state) {
               return CustomTransitionPage(
                 key: state.pageKey,
-                child: const StudentProfilePage(),
+                child: const CustomProfilePage(),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                       return FadeTransition(
@@ -303,8 +298,48 @@ GoRouter createAppRouter(AuthCubit authCubit) {
               } else {
                 return CustomTransitionPage(
                   key: state.pageKey,
-                  child: const Scaffold(
-                    body: Center(child: Text('لا يوجد عذر لعرض تفاصيله')),
+                  child: Scaffold(
+                    backgroundColor: AppColors.scaffoldBackground,
+                    body: CustomScrollView(
+                      slivers: [
+                        BuildCustomAppBar(profileOnPressed: () {}),
+                        const SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: 8.0,
+                              right: 24.0,
+                              top: 16,
+                              bottom: 12,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'تفاصيل العذر',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                                SizedBox(height: 24),
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'لا توجد اعذار جديدة',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
@@ -363,7 +398,7 @@ GoRouter createAppRouter(AuthCubit authCubit) {
             pageBuilder: (context, state) {
               return CustomTransitionPage(
                 key: state.pageKey,
-                child: const SupervisorProfilePage(),
+                child: const CustomProfilePage(),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                       return FadeTransition(
@@ -466,7 +501,7 @@ GoRouter createAppRouter(AuthCubit authCubit) {
             pageBuilder: (context, state) {
               return CustomTransitionPage(
                 key: state.pageKey,
-                child: const ManagerProfilePage(),
+                child: const CustomProfilePage(),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                       return FadeTransition(

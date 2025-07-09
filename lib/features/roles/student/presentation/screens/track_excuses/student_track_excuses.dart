@@ -16,7 +16,7 @@ class StudentTrackExcuses extends StatelessWidget {
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          StudentHomeAppBar(
+          BuildCustomAppBar(
             profileOnPressed: () {
               context.go(AppRoutes.studentProfilePage);
               context.read<NavBarCubit>().setTab(4);
@@ -100,9 +100,9 @@ class _ExcuseTrackList extends StatelessWidget {
     switch (status) {
       case 'قيد المراجعة':
         return AppColors.secondary;
-      case 'مقبولة':
+      case 'مقبول':
         return AppColors.primary;
-      case 'مرفوضة':
+      case 'مرفوض':
         return const Color(0xFFF44336);
       default:
         return Colors.grey;

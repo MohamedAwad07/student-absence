@@ -44,7 +44,7 @@ class _StudentAddExcusePageState extends State<StudentAddExcusePage> {
         backgroundColor: AppColors.scaffoldBackground,
         body: CustomScrollView(
           slivers: [
-            StudentHomeAppBar(
+            BuildCustomAppBar(
               profileOnPressed: () {
                 context.go(AppRoutes.studentProfilePage);
                 context.read<NavBarCubit>().setTab(4);

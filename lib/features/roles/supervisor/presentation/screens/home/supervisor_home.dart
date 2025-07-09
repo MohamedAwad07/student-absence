@@ -28,7 +28,7 @@ class _SupervisorHomePageState extends State<SupervisorHomePage> {
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          StudentHomeAppBar(
+          BuildCustomAppBar(
             profileOnPressed: () {
               context.go(AppRoutes.supervisorProfilePage);
               context.read<NavBarCubit>().setTab(4);

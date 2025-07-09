@@ -53,7 +53,7 @@ class StudentCubit extends Cubit<StudentState> {
       excuseId: excuseId,
       studentId: FirebaseAuth.instance.currentUser!.uid,
       reason: 'كنت مريضًا ولم أتمكن من الحضور',
-      status: 'مقبولة',
+      status: 'مقبول',
       type: 'sick',
       fileURL: null,
       imageURL: null,

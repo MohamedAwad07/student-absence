@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
@@ -9,8 +10,21 @@ import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.d
 import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class StudentHomePage extends StatelessWidget {
+class StudentHomePage extends StatefulWidget {
   const StudentHomePage({super.key});
+
+  @override
+  State<StudentHomePage> createState() => _StudentHomePageState();
+}
+
+class _StudentHomePageState extends State<StudentHomePage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<StudentCubit>().getExcuses(
+      FirebaseAuth.instance.currentUser!.uid,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +33,7 @@ class StudentHomePage extends StatelessWidget {
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          StudentHomeAppBar(
+          BuildCustomAppBar(
             profileOnPressed: () {
               context.go(AppRoutes.studentProfilePage);
               context.read<NavBarCubit>().setTab(4);
@@ -73,13 +87,17 @@ class StudentHomePage extends StatelessWidget {
                       int rejected = 0;
                       if (state is StudentExcusesLoaded) {
                         accepted = state.excuses
-                            .where((e) => e.status == 'مقبولة')
+                            .where((e) => e.status == 'مقبول')
                             .length;
                         pending = state.excuses
-                            .where((e) => e.status == 'قيد المراجعة')
+                            .where(
+                              (e) =>
+                                  e.status == 'بإنتظار القرار النهائي' ||
+                                  e.status == 'قيد المراجعة',
+                            )
                             .length;
                         rejected = state.excuses
-                            .where((e) => e.status == 'مرفوضة')
+                            .where((e) => e.status == 'مرفوض')
                             .length;
                       }
                       return Skeletonizer(
@@ -89,7 +107,7 @@ class StudentHomePage extends StatelessWidget {
                           children: [
                             _SummaryCard(
                               count: accepted,
-                              label: 'مقبولة',
+                              label: 'مقبول',
                               color: const Color(0xFF4CAF50),
                             ),
                             _SummaryCard(
@@ -99,7 +117,7 @@ class StudentHomePage extends StatelessWidget {
                             ),
                             _SummaryCard(
                               count: rejected,
-                              label: 'مرفوضة',
+                              label: 'مرفوض',
                               color: const Color(0xFFF44336),
                             ),
                           ],
@@ -140,6 +158,8 @@ class StudentHomePage extends StatelessWidget {
                                   ),
                                   title: Text(
                                     excuse.reason,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -328,11 +348,11 @@ class _SectionTitle extends StatelessWidget {
 
 Color _statusColor(String status) {
   switch (status) {
-    case 'مقبولة':
+    case 'مقبول':
       return const Color(0xFF4CAF50);
     case 'قيد المراجعة':
       return const Color(0xFFFFC107);
-    case 'مرفوضة':
+    case 'مرفوض':
       return const Color(0xFFF44336);
     default:
       return Colors.grey;

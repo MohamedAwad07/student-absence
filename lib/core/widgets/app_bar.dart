@@ -3,9 +3,9 @@ import 'package:student_absence/core/utils/app_assets.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/utils/app_strings.dart';
 
-class StudentHomeAppBar extends StatelessWidget {
+class BuildCustomAppBar extends StatelessWidget {
   final VoidCallback profileOnPressed;
-  const StudentHomeAppBar({super.key, required this.profileOnPressed});
+  const BuildCustomAppBar({super.key, required this.profileOnPressed});
 
   @override
   Widget build(BuildContext context) {

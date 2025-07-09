@@ -13,7 +13,7 @@ class SupervisorNotifications extends StatelessWidget {
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          StudentHomeAppBar(profileOnPressed: () {}),
+          BuildCustomAppBar(profileOnPressed: () {}),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(left: 16.0, top: 8),

@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
+import 'package:student_absence/core/service%20locator/di.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
 import 'package:student_absence/features/auth/controller/auth_cubit/auth_state.dart';
 
-class SupervisorProfilePage extends StatelessWidget {
-  const SupervisorProfilePage({super.key});
+class CustomProfilePage extends StatefulWidget {
+  const CustomProfilePage({super.key});
+
+  @override
+  State<CustomProfilePage> createState() => _CustomProfilePageState();
+}
+
+class _CustomProfilePageState extends State<CustomProfilePage> {
+  bool notifyExcuses = true;
+  bool notifySystem = true;
 
   @override
   Widget build(BuildContext context) {
+    final userModel = context.read<AuthCubit>().currentUser;
     return BlocListener<AuthCubit, AuthState>(
-     listener: (context, state) {
+      listener: (context, state) {
         if (state is Unauthenticated) {
           context.go(AppRoutes.loginWelcome);
         }
@@ -22,7 +32,7 @@ class SupervisorProfilePage extends StatelessWidget {
         backgroundColor: AppColors.scaffoldBackground,
         body: CustomScrollView(
           slivers: [
-            StudentHomeAppBar(profileOnPressed: () {}),
+            BuildCustomAppBar(profileOnPressed: () {}),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -32,7 +42,6 @@ class SupervisorProfilePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 8),
                     // Title
                     const Text(
                       'الإعدادات',
@@ -59,9 +68,9 @@ class SupervisorProfilePage extends StatelessWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          CircleAvatar(
+                          const CircleAvatar(
                             radius: 28,
                             backgroundColor: AppColors.primary,
                             child: Icon(
@@ -70,22 +79,28 @@ class SupervisorProfilePage extends StatelessWidget {
                               size: 32,
                             ),
                           ),
-                          SizedBox(width: 16),
+                          const SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'د. محمد العمري',
-                                  style: TextStyle(
+                                  userModel?.name ?? "غير معروف",
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
                                 ),
-                                SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
-                                  'مشرف',
-                                  style: TextStyle(
+                                  userModel?.role == "student"
+                                      ? "طالب"
+                                      : userModel?.role == "supervisor"
+                                      ? "مشرف"
+                                      : userModel?.role == "manager"
+                                      ? "مدير"
+                                      : "غير معروف",
+                                  style: const TextStyle(
                                     color: Colors.black54,
                                     fontSize: 13,
                                   ),
@@ -93,7 +108,10 @@ class SupervisorProfilePage extends StatelessWidget {
                               ],
                             ),
                           ),
-                          Icon(Icons.chevron_right, color: Colors.black45),
+                          const Icon(
+                            Icons.chevron_right,
+                            color: Colors.black45,
+                          ),
                         ],
                       ),
                     ),
@@ -122,7 +140,43 @@ class SupervisorProfilePage extends StatelessWidget {
                         ),
                         const Spacer(),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            final emailController = TextEditingController(
+                              text: userModel?.email ?? '',
+                            );
+                            final result = await showDialog<String>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('إعادة تعيين كلمة المرور'),
+                                content: TextField(
+                                  controller: emailController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'البريد الإلكتروني',
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: const Text('إلغاء'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () => Navigator.of(
+                                      context,
+                                    ).pop(emailController.text),
+                                    child: const Text('إرسال'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (result != null && result.isNotEmpty) {
+                              context.read<AuthCubit>().resetPassword(result);
+                              toastLocator.success(
+                                context,
+                                 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني (إن وجد).',
+                              );
+                            }
+                          },
                           child: const Text(
                             'تغيير كلمة المرور',
                             style: TextStyle(
@@ -133,24 +187,27 @@ class SupervisorProfilePage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const Row(
+                    Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.email_outlined,
                           color: Colors.black45,
                           size: 20,
                         ),
-                        SizedBox(width: 8),
-                        Text(
+                        const SizedBox(width: 8),
+                        const Text(
                           'البريد الإلكتروني',
                           style: TextStyle(fontSize: 14),
                         ),
-                        Spacer(),
-                        Text(
-                          'm.alomari@university.edu.sa',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontSize: 13,
+                        const Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Text(
+                            userModel?.email ?? "غير معروف",
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                       ],
@@ -187,7 +244,7 @@ class SupervisorProfilePage extends StatelessWidget {
                               child: Text('العربية'),
                             ),
                           ],
-                          onChanged: (v) {},
+                          onChanged: null,
                         ),
                       ],
                     ),
@@ -210,8 +267,12 @@ class SupervisorProfilePage extends StatelessWidget {
                         ),
                         const Spacer(),
                         Switch(
-                          value: true,
-                          onChanged: (v) {},
+                          value: notifyExcuses,
+                          onChanged: (v) {
+                            setState(() {
+                              notifyExcuses = v;
+                            });
+                          },
                           activeColor: AppColors.primary,
                         ),
                       ],
@@ -224,8 +285,12 @@ class SupervisorProfilePage extends StatelessWidget {
                         ),
                         const Spacer(),
                         Switch(
-                          value: true,
-                          onChanged: (v) {},
+                          value: notifySystem,
+                          onChanged: (v) {
+                            setState(() {
+                              notifySystem = v;
+                            });
+                          },
                           activeColor: AppColors.primary,
                         ),
                       ],

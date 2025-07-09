@@ -60,7 +60,7 @@ class ManagerHomePage extends StatelessWidget {
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          StudentHomeAppBar(profileOnPressed: () {}),
+          BuildCustomAppBar(profileOnPressed: () {}),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(

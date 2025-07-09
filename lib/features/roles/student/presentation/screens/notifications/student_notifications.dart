@@ -11,7 +11,7 @@ class StudentNotifications extends StatelessWidget {
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          StudentHomeAppBar(profileOnPressed: () {}),
+          BuildCustomAppBar(profileOnPressed: () {}),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8.0),

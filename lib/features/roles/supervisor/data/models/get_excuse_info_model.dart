@@ -1,4 +1,5 @@
 class GetExcuseInfoModel {
+  final String excuseId;
   final String studentId;
   final String studentName;
   final String studentAcademicNumber;
@@ -10,6 +11,7 @@ class GetExcuseInfoModel {
   String? imageURL;
 
   GetExcuseInfoModel({
+    required this.excuseId,
     required this.studentId,
     required this.studentName,
     required this.studentAcademicNumber,
