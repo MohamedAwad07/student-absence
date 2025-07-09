@@ -10,6 +10,7 @@ import 'package:student_absence/features/auth/login/presentation/login_screen.da
 import 'package:student_absence/features/auth/login/presentation/login_welcome.dart';
 import 'package:student_absence/features/auth/presentation/auth_gate.dart';
 import 'package:student_absence/features/auth/register/presentation/register_screen.dart';
+import 'package:student_absence/features/roles/manager/presentation/controller/manager_cubit/manager_cubit.dart';
 import 'package:student_absence/features/roles/manager/presentation/manager_bottom_nav.dart';
 import 'package:student_absence/features/roles/manager/presentation/screens/excuse_details/manager_excuse_details.dart';
 import 'package:student_absence/features/roles/manager/presentation/screens/home/manager_home.dart';
@@ -417,7 +418,13 @@ GoRouter createAppRouter(AuthCubit authCubit) {
       // * Shell Route for Manager
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
-        builder: (context, state, child) => ManagerBottomNavBar(child: child),
+        builder: (context, state, child) => MultiBlocProvider(
+          providers: [
+            BlocProvider<ManagerCubit>(create: (_) => ManagerCubit()),
+            BlocProvider<NavBarCubit>(create: (_) => NavBarCubit()),
+          ],
+          child: ManagerBottomNavBar(child: child),
+        ),
         routes: [
           GoRoute(
             path: AppRoutes.managerHome,

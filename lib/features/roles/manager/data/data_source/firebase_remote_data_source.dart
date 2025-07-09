@@ -1,0 +1,119 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dartz/dartz.dart';
+import 'package:student_absence/core/service%20locator/di.dart';
+import 'package:student_absence/features/roles/manager/data/models/update_excuse_manager.dart';
+import 'package:student_absence/features/roles/manager/data/repos/repo.dart';
+import 'package:student_absence/features/roles/student/data/repos/repo.dart';
+import 'package:student_absence/features/roles/supervisor/data/models/get_excuse_info_model.dart';
+
+class ManagerFirebaseRemoteDataSource implements ManagerRepo {
+  final _excusesCollection = firestoreLocator.collection('excuses');
+  final _usersCollection = firestoreLocator.collection('users');
+
+  @override
+  Future<Either<Failure, List<GetExcuseInfoModel>>> getRevisedExcuses({
+    required String managerId,
+  }) async {
+    try {
+      // 1. Get excuses assigned to this manager
+      final excuseQuery = await _excusesCollection
+          .where('managerId', isEqualTo: managerId)
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      final List<GetExcuseInfoModel> result = [];
+
+      for (final doc in excuseQuery.docs) {
+        final excuseData = doc.data();
+        final studentId = excuseData['studentId'];
+
+        // 2. Get related student info
+        final studentDoc = await _usersCollection.doc(studentId).get();
+        final studentData = studentDoc.data();
+
+        if (studentData != null) {
+          final model = GetExcuseInfoModel(
+            excuseId: doc.id,
+            studentId: studentId,
+            studentName: studentData['username'],
+            studentAcademicNumber: studentData['academicNumber'] ?? '',
+            status: excuseData['status'] ?? '',
+            reason: excuseData['reason'] ?? '',
+            type: excuseData['type'] ?? '',
+            createdAt: (excuseData['createdAt'] as Timestamp).toDate(),
+            fileURL: excuseData['fileURL'],
+            imageURL: excuseData['imageURL'],
+          );
+
+          result.add(model);
+        }
+      }
+
+      return Right(result);
+    } catch (e) {
+      return Left(
+        Failure('فشل في جلب الأعذار الخاصة بالمشرف', code: e.toString()),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<GetExcuseInfoModel>>> getPendingExcuses() async {
+    try {
+      final excuseQuery = await _excusesCollection
+          .where('status', isEqualTo: 'بإنتظار القرار النهائي')
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      final List<GetExcuseInfoModel> result = [];
+
+      for (final doc in excuseQuery.docs) {
+        final excuseData = doc.data();
+        final studentId = excuseData['studentId'];
+
+        // 2. جلب بيانات الطالب من كوليكشن المستخدمين
+        final studentDoc = await _usersCollection.doc(studentId).get();
+        final studentData = studentDoc.data();
+
+        if (studentData != null) {
+          final model = GetExcuseInfoModel(
+            excuseId: doc.id,
+            studentId: studentId,
+            studentName: studentData['username'] ?? '',
+            studentAcademicNumber: studentData['academicNumber'] ?? '',
+            status: excuseData['status'] ?? '',
+            reason: excuseData['reason'] ?? '',
+            type: excuseData['type'] ?? '',
+            createdAt: (excuseData['createdAt'] as Timestamp).toDate(),
+            fileURL: excuseData['fileURL'],
+            imageURL: excuseData['imageURL'],
+          );
+
+          result.add(model);
+        }
+      }
+
+      return Right(result);
+    } catch (e) {
+      return Left(
+        Failure('فشل في جلب الأعذار ', code: e.toString()),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> updateExcuseStatus({
+    required String excuseId,
+    required ManagerUpdateExcuseModel managerUpdateExcuseModel,
+  }) async {
+    try {
+      await _excusesCollection
+          .doc(excuseId)
+          .update(managerUpdateExcuseModel.toFirestore());
+
+      return const Right('تم تحديث حالة العذر بنجاح');
+    } catch (e) {
+      return Left(Failure('فشل في تحديث حالة العذر', code: e.toString()));
+    }
+  }
+}

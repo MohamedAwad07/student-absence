@@ -5,6 +5,8 @@ import 'package:student_absence/core/utils/image_picker.dart';
 import 'package:student_absence/core/utils/toasts.dart';
 import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
 import 'package:student_absence/features/auth/controller/firebase_service.dart';
+import 'package:student_absence/features/roles/manager/data/data_source/firebase_remote_data_source.dart';
+import 'package:student_absence/features/roles/manager/data/repos/repo.dart';
 import 'package:student_absence/features/roles/student/data/data_source/remote_data_source.dart';
 import 'package:student_absence/features/roles/student/data/repos/repo.dart';
 import 'package:student_absence/features/roles/supervisor/data/data_source/firebase_remote_data_source.dart';
@@ -24,6 +26,9 @@ void setUp() {
   locator.registerLazySingleton<SupervisorRepo>(
     () => SupervisorFirebaseRemoteDataSource(),
   );
+  locator.registerLazySingleton<ManagerRepo>(
+    () => ManagerFirebaseRemoteDataSource(),
+  );
 }
 
 final imagePickerLocator = locator<AssetsPickerHelper>();
@@ -33,3 +38,4 @@ final toastLocator = locator<ToastsHelper>();
 final authCubitLocator = locator<AuthCubit>();
 final studentRepoLocator = locator<StudentRepo>();
 final supervisorRepoLocator = locator<SupervisorRepo>();
+final managerRepoLocator = locator<ManagerRepo>();
