@@ -73,7 +73,7 @@ class _SupervisorExcuseDetailsPageState
     return BlocListener<SupervisorCubit, SupervisorState>(
       listener: (context, state) {
         if (state is SupervisorExcuseStatusUpdated) {
-          toastLocator.success(context, 'تم تحديث حالة الإذن بنجاح');
+          toastLocator.success(context, 'تم تحديث حالة العذر بنجاح');
           context.go(AppRoutes.supervisorHome);
           context.read<NavBarCubit>().setTab(0);
         } else if (state is SupervisorError) {

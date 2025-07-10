@@ -52,4 +52,20 @@ platform :android do
                         Please test all user roles and provide feedback on the new interface."
     )
   end
+
+  desc "Distribute FINAL release - project complete with summary"
+  lane :final_release do
+    require 'dotenv'
+    Dotenv.load(File.expand_path('../../.env', __dir__))
+    sh "flutter clean"
+    sh "flutter build apk --release --split-per-abi"
+    firebase_app_distribution(
+      app: ENV['FIREBASE_APP_ID'],
+      firebase_cli_token: ENV['FIREBASE_CLI_TOKEN'],
+      android_artifact_type: "APK",
+      android_artifact_path: "../build/app/outputs/flutter-apk/app-arm64-v8a-release.apk",
+      testers: "mmaatt712@gmail.com , yousefgus111@gmail.com, hossamawad702@gmail.com",
+      release_notes: "🎉 FINAL RELEASE - Student Absence Management App\n\n✅ Project Complete!\nThis release marks the successful completion of the Student Absence Management App. The app streamlines the process of submitting, tracking, and managing student absence requests for students, supervisors, and managers.\n\n✨ Key Features:\n• Role-based interfaces for Students, Supervisors, and Managers\n• Easy submission and tracking of absence excuses\n• Real-time notifications and status updates\n• Comprehensive dashboard and management tools\n• Secure authentication and user management\n• Modern, responsive, and user-friendly UI\n\nThank you to everyone who contributed and tested the app. Please enjoy the final version!"
+    )
+  end
 end

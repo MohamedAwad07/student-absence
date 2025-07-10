@@ -31,6 +31,14 @@ Distribute app to firebase app distribution
 
 Distribute NEW release with comprehensive UI updates
 
+### android final_release
+
+```sh
+[bundle exec] fastlane android final_release
+```
+
+Distribute FINAL release - project complete with summary
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

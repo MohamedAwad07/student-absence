@@ -12,95 +12,83 @@ class LoginWelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 16),
-              const LoginLogo(
-                iconColor: AppColors.white,
-                iconPath: Assets.assetsImagesLogoLogoGreen,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 16),
+            const LoginLogo(
+              iconColor: AppColors.white,
+              iconPath: Assets.assetsImagesLogoLogoGreen,
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              AppStrings.welcome,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
               ),
-              const SizedBox(height: 24),
-              const Text(
-                AppStrings.welcome,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-                textAlign: TextAlign.center,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              AppStrings.systemTitle,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppColors.secondary,
               ),
-              const SizedBox(height: 8),
-              const Text(
-                AppStrings.systemTitle,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.secondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
 
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Column(
-                  spacing: 16,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Text(
-                        textAlign: TextAlign.center,
-                        AppStrings.systemDescription,
-                        style: TextStyle(fontSize: 14),
-                      ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Column(
+                spacing: 16,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      textAlign: TextAlign.center,
+                      AppStrings.systemDescription,
+                      style: TextStyle(fontSize: 14),
                     ),
-                    SizedBox(height: 2),
-                    InfoItem(text: AppStrings.featureEasySubmission),
-                    InfoItem(text: AppStrings.featureTrackStatus),
-                    InfoItem(text: AppStrings.featureInstantNotifications),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: 2),
+                  InfoItem(text: AppStrings.featureEasySubmission),
+                  InfoItem(text: AppStrings.featureTrackStatus),
+                  InfoItem(text: AppStrings.featureInstantNotifications),
+                ],
               ),
-              const SizedBox(height: 30),
-
-              // Buttons
-              CustomWelcomeButton(
-                label: AppStrings.studentLogin,
-                backgroundColor: AppColors.primary,
-                textColor: Colors.white,
-                onPressed: () {
-                  context.go('/login/student');
-                },
-              ),
-              const SizedBox(height: 12),
-              CustomWelcomeButton(
-                label: AppStrings.supervisorLogin,
-                backgroundColor: AppColors.secondary,
-                textColor: Colors.black87,
-                onPressed: () {
-                  context.go('/login/supervisor');
-                },
-              ),
-              const SizedBox(height: 12),
-              CustomWelcomeButton(
-                label: AppStrings.facultyLogin,
-                backgroundColor: Colors.white,
-                textColor: Colors.black,
-                borderColor: AppColors.primary,
-                onPressed: () {
-                  context.go('/login/manager');
-                },
-              ),
-            ],
-          ),
+            ),
+            const Spacer(),
+            // Buttons
+            CustomWelcomeButton(
+              label: AppStrings.login,
+              backgroundColor: AppColors.primary,
+              textColor: Colors.white,
+              onPressed: () {
+                context.go('/login/student');
+              },
+            ),
+            const SizedBox(height: 12),
+            CustomWelcomeButton(
+              label: AppStrings.register,
+              backgroundColor: AppColors.secondary,
+              textColor: Colors.black87,
+              onPressed: () {
+                context.push('/register?role=student');
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
         ),
       ),
     );

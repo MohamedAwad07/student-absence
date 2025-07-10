@@ -149,6 +149,7 @@ class _CustomProfilePageState extends State<CustomProfilePage> {
                               builder: (context) => AlertDialog(
                                 title: const Text('إعادة تعيين كلمة المرور'),
                                 content: TextField(
+                                  enabled: false,
                                   controller: emailController,
                                   decoration: const InputDecoration(
                                     labelText: 'البريد الإلكتروني',

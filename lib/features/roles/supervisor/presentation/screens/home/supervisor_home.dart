@@ -107,9 +107,9 @@ class _ReviewedExcuseList extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        _StatusChip(
-                          status: excuse.status,
-                          color: _statusColor(excuse.status),
+                        const _StatusChip(
+                          status: "جديد",
+                          color: AppColors.secondary,
                         ),
                       ],
                     ),
@@ -243,18 +243,18 @@ class _ExcuseSkeletonCard extends StatelessWidget {
   }
 }
 
-Color _statusColor(String status) {
-  switch (status) {
-    case 'مقبول':
-      return AppColors.primary;
-    case 'قيد المراجعة':
-      return AppColors.secondary;
-    case 'مرفوض':
-      return const Color(0xFFF44336);
-    default:
-      return Colors.grey;
-  }
-}
+// Color _statusColor(String status) {
+//   switch (status) {
+//     case 'مقبول':
+//       return AppColors.primary;
+//     case 'جديد':
+//       return AppColors.secondary;
+//     case 'مرفوض':
+//       return const Color(0xFFF44336);
+//     default:
+//       return Colors.grey;
+//   }
+// }
 
 class _StatusChip extends StatelessWidget {
   final String status;

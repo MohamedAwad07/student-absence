@@ -52,11 +52,7 @@ class AuthCubit extends Cubit<AuthState> {
     }, (failure) => emit(Unauthenticated(errorMessage: failure.message)));
   }
 
-  Future<void> login({
-    required String email,
-    required String password,
-    required String role,
-  }) async {
+  Future<void> login({required String email, required String password}) async {
     emit(AuthLoading());
     final result = await authLocator.signInWithEmailAndPassword(
       email: email,
@@ -69,15 +65,10 @@ class AuthCubit extends Cubit<AuthState> {
           .doc(success.userId)
           .get();
       currentUser = UserModel.fromJson(userDoc.data(), success.userId);
-      if (currentUser!.role != role) {
-        emit(
-          RoleException(
-            message:
-                "الدور المختار لا يتطابق مع دور الحساب. يرجى اختيار الدور الصحيح.",
-          ),
-        );
-      } else {
+      if (currentUser != null) {
         emit(Authenticated(user: currentUser!));
+      } else {
+        emit(Unauthenticated(errorMessage: 'User data not found'));
       }
     }, (failure) => emit(Unauthenticated(errorMessage: failure.message)));
   }

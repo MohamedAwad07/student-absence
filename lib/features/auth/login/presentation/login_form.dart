@@ -11,8 +11,7 @@ import 'package:student_absence/features/auth/custom_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginForm extends StatefulWidget {
-  final String role;
-  const LoginForm({super.key, required this.role});
+  const LoginForm({super.key});
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -121,7 +120,6 @@ class _LoginFormState extends State<LoginForm> {
                               return;
                             } else {
                               context.read<AuthCubit>().login(
-                                role: widget.role,
                                 email: _emailController.text,
                                 password: _passwordController.text,
                               );
