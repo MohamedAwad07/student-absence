@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
 import 'package:student_absence/features/auth/controller/auth_cubit/auth_state.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
@@ -14,7 +15,9 @@ class AuthGate extends StatelessWidget {
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
         if (state is AuthLoading) {
-          return const CircularProgressIndicator();
+          return const CircularProgressIndicator(
+            color: AppColors.primary,
+          );
         } else if (state is Unauthenticated) {
           return const LoginWelcomeScreen();
         } else if (state is Authenticated) {

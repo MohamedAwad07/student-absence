@@ -17,10 +17,12 @@ class StudentNotifications extends StatelessWidget {
   Widget build(BuildContext context) {
     // Mark all notifications as read when the page is opened
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userId = FirebaseAuth.instance.currentUser?.uid;
-      if (userId != null) {
-        context.read<StudentCubit>().markAllNotificationsAsRead(userId);
-      }
+      Future.delayed(const Duration(seconds: 1), () {
+        final userId = FirebaseAuth.instance.currentUser?.uid;
+        if (userId != null) {
+          context.read<StudentCubit>().markAllNotificationsAsRead(userId);
+        }
+      });
     });
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,

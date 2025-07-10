@@ -13,7 +13,6 @@ class AuthCubit extends Cubit<AuthState> {
   UserModel? currentUser;
 
   void checkAuthState() {
-    log("i am in check auth state");
     emit(AuthLoading());
     FirebaseAuth.instance.authStateChanges().listen((firebaseUser) async {
       if (firebaseUser != null) {
@@ -21,7 +20,7 @@ class AuthCubit extends Cubit<AuthState> {
             .collection('users')
             .doc(firebaseUser.uid)
             .get();
-        log("userDoc : ${userDoc.data().toString()}");
+        log("user data : ${userDoc.data().toString()}");
         if (userDoc.data() != null) {
           currentUser = UserModel.fromJson(userDoc.data(), firebaseUser.uid);
           emit(Authenticated(user: currentUser!));

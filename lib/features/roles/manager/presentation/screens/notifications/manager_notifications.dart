@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:student_absence/core/routing/app_routes.dart';
+import 'package:student_absence/core/utils/nav_bar_cubit.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,13 +17,20 @@ class ManagerNotificationsPage extends StatelessWidget {
     final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
     // Mark all notifications as read when the page is opened
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ManagerCubit>().markAllNotificationsAsRead(currentUserId);
+      Future.delayed(const Duration(seconds: 1), () {
+        context.read<ManagerCubit>().markAllNotificationsAsRead(currentUserId);
+      });
     });
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          BuildCustomAppBar(profileOnPressed: () {}),
+          BuildCustomAppBar(
+            profileOnPressed: () {
+              context.go(AppRoutes.managerProfilePage);
+              context.read<NavBarCubit>().setTab(4);
+            },
+          ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(
@@ -45,7 +55,7 @@ class ManagerNotificationsPage extends StatelessWidget {
                         Spacer(),
                         Icon(
                           Icons.filter_alt,
-                          color: AppColors.primary,
+                          color: AppColors.secondary,
                           size: 28,
                         ),
                       ],
@@ -86,7 +96,7 @@ class NotificationList extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: AppColors.primary,));
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return const Center(child: Text('لا توجد إشعارات حالياً'));

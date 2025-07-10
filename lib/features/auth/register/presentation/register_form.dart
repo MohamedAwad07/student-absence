@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
+import 'package:student_absence/core/service%20locator/di.dart';
 import 'package:student_absence/core/widgets/custom_text_field.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/utils/app_constants.dart';
@@ -74,9 +75,11 @@ class RegisterFormState extends State<RegisterForm> {
               break;
           }
         } else if (state is Unauthenticated) {
-          ScaffoldMessenger.of(
+          toastLocator.error(
             context,
-          ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
+            "خطأ",
+            state.errorMessage,
+          );
           context.read<AuthCubit>().reset();
         }
       },
@@ -190,28 +193,21 @@ class RegisterFormState extends State<RegisterForm> {
                           confirmPasswordController.text.isEmpty ||
                           nameController.text.isEmpty ||
                           academicNumberController.text.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Center(
-                              child: Text(AppStrings.fillAllFields),
-                            ),
-                          ),
-                        );
+                        toastLocator.warning(
+                                context,
+                               AppStrings.fillAllFields,
+                              );
                       } else if (passwordController.text !=
                           confirmPasswordController.text) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Center(
-                              child: Text(AppStrings.passowrdNotMatch),
-                            ),
-                          ),
-                        );
+                         toastLocator.warning(
+                                context,
+                               AppStrings.passowrdNotMatch,
+                              );
                       } else if (selectedRole == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Center(child: Text('يرجي اختيار الوظيفة')),
-                          ),
-                        );
+                         toastLocator.warning(
+                                context,
+                               "يرجي اختيار الوظيفة",
+                              );
                       } else {
                         final userModel = UserModel(
                           id: '',

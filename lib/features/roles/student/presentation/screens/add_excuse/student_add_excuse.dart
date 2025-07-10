@@ -40,8 +40,10 @@ class _StudentAddExcusePageState extends State<StudentAddExcusePage> {
       if (url != null) {
         imageURL = url;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('فشل رفع الصورة. حاول مرة أخرى.')),
+        toastLocator.error(
+          context,
+          "خطأ",
+          "فشل رفع الصورة , برجاء المحاولة مرة اخري",
         );
       }
     });
@@ -55,8 +57,10 @@ class _StudentAddExcusePageState extends State<StudentAddExcusePage> {
       if (url != null) {
         fileURL = url;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('فشل رفع ملف PDF. حاول مرة أخرى.')),
+        toastLocator.error(
+          context,
+          "خطأ",
+          "فشل رفع الملف , برجاء المحاولة مرة اخري",
         );
       }
     });
@@ -79,15 +83,11 @@ class _StudentAddExcusePageState extends State<StudentAddExcusePage> {
     return BlocListener<StudentCubit, StudentState>(
       listener: (context, state) {
         if (state is StudentExcuseSubmitted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+          toastLocator.success(context, "تم تقديم العذر بنجاح");
           context.go(AppRoutes.studentTrackExcuses);
           context.read<NavBarCubit>().setTab(1);
         } else if (state is StudentError) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+          toastLocator.error(context, "خطأ", state.message);
         }
       },
       child: Scaffold(

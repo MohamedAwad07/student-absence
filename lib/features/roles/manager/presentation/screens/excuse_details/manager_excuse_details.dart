@@ -27,9 +27,7 @@ class _ManagerExcuseDetailsState extends State<ManagerExcuseDetails> {
   void _openUrl(String url) async {
     final uri = Uri.tryParse(url);
     if (uri == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('الرابط غير صالح')));
+      toastLocator.error(context, "خطأ", "تعذر فتح الرابط");
       return;
     }
     try {
@@ -38,14 +36,10 @@ class _ManagerExcuseDetailsState extends State<ManagerExcuseDetails> {
         mode: LaunchMode.externalApplication,
       );
       if (!launched) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('تعذر فتح الرابط')));
+        toastLocator.error(context, "خطأ", "تعذر فتح الرابط");
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('تعذر فتح الرابط')));
+      toastLocator.error(context, "خطأ", "تعذر فتح الرابط");
     }
   }
 

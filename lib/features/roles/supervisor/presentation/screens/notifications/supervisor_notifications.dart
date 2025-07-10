@@ -28,10 +28,12 @@ class SupervisorNotifications extends StatelessWidget {
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          BuildCustomAppBar(profileOnPressed: () {
-            context.go(AppRoutes.supervisorProfilePage);
-            context.read<NavBarCubit>().setTab(4);
-          }),
+          BuildCustomAppBar(
+            profileOnPressed: () {
+              context.go(AppRoutes.supervisorProfilePage);
+              context.read<NavBarCubit>().setTab(4);
+            },
+          ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(left: 16.0, top: 8),
@@ -133,7 +135,9 @@ class _NotificationListState extends State<NotificationList> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          );
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return const Center(child: Text('لا توجد إشعارات حالياً'));

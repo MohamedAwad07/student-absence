@@ -305,8 +305,30 @@ class _CustomProfilePageState extends State<CustomProfilePage> {
                             borderRadius: BorderRadius.circular(24),
                           ),
                         ),
-                        onPressed: () {
-                          context.read<AuthCubit>().signOut();
+                        onPressed: () async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('تأكيد تسجيل الخروج'),
+                              content: const Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                  child: const Text('إلغاء'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                  ),
+                                  child: const Text('تأكيد', style: TextStyle(color: Colors.white)),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirmed == true) {
+                            context.read<AuthCubit>().signOut();
+                          }
                         },
                         child: const Text(
                           'تسجيل الخروج',

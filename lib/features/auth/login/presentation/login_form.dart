@@ -44,9 +44,7 @@ class _LoginFormState extends State<LoginForm> {
               context.go(AppRoutes.loginWelcome);
           }
         } else if (state is Unauthenticated) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
+          toastLocator.error(context, "خطأ", state.errorMessage);
         }
       },
       child: Container(
@@ -106,7 +104,9 @@ class _LoginFormState extends State<LoginForm> {
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
                       if (state is AuthLoading) {
-                        return const CircularProgressIndicator();
+                        return const CircularProgressIndicator(
+                          color: AppColors.primary,
+                        );
                       }
                       return CustomButton(
                         label: AppStrings.login,
@@ -114,12 +114,9 @@ class _LoginFormState extends State<LoginForm> {
                           if (_formKey.currentState!.validate()) {
                             if (_emailController.text.isEmpty ||
                                 _passwordController.text.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Center(
-                                    child: Text(AppStrings.fillAllFields),
-                                  ),
-                                ),
+                              toastLocator.warning(
+                                context,
+                                "يجب ادخال البيانات",
                               );
                               return;
                             } else {
@@ -146,42 +143,41 @@ class _LoginFormState extends State<LoginForm> {
                     alignment: Alignment.center,
                     child: TextButton(
                       onPressed: () async {
-                            final emailController = TextEditingController(
-                              text: _emailController.text,
-                            );
-                            final result = await showDialog<String>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('إعادة تعيين كلمة المرور'),
-                                content: TextField(
-                                  controller: emailController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'البريد الإلكتروني',
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                    child: const Text('إلغاء'),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () => Navigator.of(
-                                      context,
-                                    ).pop(emailController.text),
-                                    child: const Text('إرسال'),
-                                  ),
-                                ],
+                        final emailController = TextEditingController(
+                          text: _emailController.text,
+                        );
+                        final result = await showDialog<String>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('إعادة تعيين كلمة المرور'),
+                            content: TextField(
+                              controller: emailController,
+                              decoration: const InputDecoration(
+                                labelText: 'البريد الإلكتروني',
                               ),
-                            );
-                            if (result != null && result.isNotEmpty) {
-                              context.read<AuthCubit>().resetPassword(result);
-                              toastLocator.success(
-                                context,
-                                 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني (إن وجد).',
-                              );
-                            }
-                          },
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('إلغاء'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () => Navigator.of(
+                                  context,
+                                ).pop(emailController.text),
+                                child: const Text('إرسال'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (result != null && result.isNotEmpty) {
+                          context.read<AuthCubit>().resetPassword(result);
+                          toastLocator.success(
+                            context,
+                            'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني (إن وجد).',
+                          );
+                        }
+                      },
                       child: const Text(
                         AppStrings.forgotPassword,
                         style: TextStyle(color: Colors.black, fontSize: 14),
