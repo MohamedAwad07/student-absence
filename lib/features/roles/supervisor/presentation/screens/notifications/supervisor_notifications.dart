@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
+import 'package:student_absence/core/utils/nav_bar_cubit.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:student_absence/features/roles/supervisor/presentation/controller/supervisor_cubit/supervisor_cubit.dart';
 
+// ignore: must_be_immutable
 class SupervisorNotifications extends StatelessWidget {
   const SupervisorNotifications({super.key});
 
@@ -16,13 +18,20 @@ class SupervisorNotifications extends StatelessWidget {
     final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
     // Mark all notifications as read when the page is opened
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SupervisorCubit>().markAllNotificationsAsRead(currentUserId);
+      Future.delayed(const Duration(seconds: 1), () {
+        context.read<SupervisorCubit>().markAllNotificationsAsRead(
+          currentUserId,
+        );
+      });
     });
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          BuildCustomAppBar(profileOnPressed: () {}),
+          BuildCustomAppBar(profileOnPressed: () {
+            context.go(AppRoutes.supervisorProfilePage);
+            context.read<NavBarCubit>().setTab(4);
+          }),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(left: 16.0, top: 8),
@@ -74,6 +83,7 @@ class SupervisorNotifications extends StatelessWidget {
                       ),
                       onPressed: () {
                         context.go(AppRoutes.supervisorHome);
+                        context.read<NavBarCubit>().setTab(0);
                       },
                       child: const Text(
                         'العودة للوحة التحكم',
@@ -94,10 +104,16 @@ class SupervisorNotifications extends StatelessWidget {
   }
 }
 
-class NotificationList extends StatelessWidget {
+class NotificationList extends StatefulWidget {
   final String userId;
   const NotificationList({required this.userId, super.key});
 
+  @override
+  State<NotificationList> createState() => _NotificationListState();
+}
+
+class _NotificationListState extends State<NotificationList> {
+  Color notificationColors = AppColors.secondary;
   String _formatDate(Timestamp? timestamp) {
     if (timestamp == null) return '';
     final date = timestamp.toDate();
@@ -112,7 +128,7 @@ class NotificationList extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('notifications')
-          .where('userId', isEqualTo: userId)
+          .where('userId', isEqualTo: widget.userId)
           .orderBy('createdAt', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
@@ -162,7 +178,7 @@ class NotificationList extends StatelessWidget {
                           children: [
                             const Icon(
                               Icons.access_time,
-                              color: Colors.amber,
+                              color: AppColors.secondary,
                               size: 16,
                             ),
                             const SizedBox(width: 2),
@@ -183,7 +199,9 @@ class NotificationList extends StatelessWidget {
                     width: 8,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: data['isRead'] == true
+                          ? AppColors.primary
+                          : AppColors.secondary,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),

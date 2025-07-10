@@ -155,12 +155,14 @@ GoRouter createAppRouter(AuthCubit authCubit) {
                 return StudentBottomNavBar(child: child);
               }
               return StreamBuilder<int>(
-                stream: context.read<StudentCubit>().getUnreadNotificationsCount(userId),
+                stream: context
+                    .read<StudentCubit>()
+                    .getUnreadNotificationsCount(userId),
                 builder: (context, snapshot) {
                   final unreadCount = snapshot.data ?? 0;
                   return StudentBottomNavBar(
-                    child: child,
                     unreadNotificationsCount: unreadCount,
+                    child: child,
                   );
                 },
               );
@@ -280,12 +282,14 @@ GoRouter createAppRouter(AuthCubit authCubit) {
                 return SupervisorBottomNavBar(child: child);
               }
               return StreamBuilder<int>(
-                stream: context.read<SupervisorCubit>().getUnreadNotificationsCount(userId),
+                stream: context
+                    .read<SupervisorCubit>()
+                    .getUnreadNotificationsCount(userId),
                 builder: (context, snapshot) {
                   final unreadCount = snapshot.data ?? 0;
                   return SupervisorBottomNavBar(
-                    child: child,
                     unreadNotificationsCount: unreadCount,
+                    child: child,
                   );
                 },
               );
@@ -465,12 +469,14 @@ GoRouter createAppRouter(AuthCubit authCubit) {
                 return ManagerBottomNavBar(child: child);
               }
               return StreamBuilder<int>(
-                stream: context.read<ManagerCubit>().getUnreadNotificationsCount(userId),
+                stream: context
+                    .read<ManagerCubit>()
+                    .getUnreadNotificationsCount(userId),
                 builder: (context, snapshot) {
                   final unreadCount = snapshot.data ?? 0;
                   return ManagerBottomNavBar(
-                    child: child,
                     unreadNotificationsCount: unreadCount,
+                    child: child,
                   );
                 },
               );

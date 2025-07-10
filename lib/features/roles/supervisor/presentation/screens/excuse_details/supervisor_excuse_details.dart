@@ -52,22 +52,25 @@ class _SupervisorExcuseDetailsPageState
   void _openUrl(String url) async {
     final uri = Uri.tryParse(url);
     if (uri == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الرابط غير صالح')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('الرابط غير صالح')));
       return;
     }
     try {
-      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
       if (!launched) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تعذر فتح الرابط')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('تعذر فتح الرابط')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذر فتح الرابط')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تعذر فتح الرابط')));
     }
   }
 
@@ -413,12 +416,10 @@ class _SupervisorExcuseDetailsPageState
                                     borderRadius: BorderRadius.circular(24),
                                   ),
                                 ),
-                                onPressed: isLoading
-                                    ? null
-                                    : () {
-                                        context.go(AppRoutes.supervisorHome);
-                                        context.read<NavBarCubit>().setTab(0);
-                                      },
+                                onPressed: () {
+                                  context.go(AppRoutes.supervisorHome);
+                                  context.read<NavBarCubit>().setTab(0);
+                                },
                                 child: const Text(
                                   'رجوع',
                                   style: TextStyle(

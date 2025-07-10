@@ -26,20 +26,4 @@ class GetExcuseInfoModel {
     this.fileURL,
     this.imageURL,
   });
-
-  // factory GetExcuseInfoModel.fromFirebase(DocumentSnapshot doc) {
-  //   final data = doc.data() as Map<String, dynamic>;
-
-  //   return GetExcuseInfoModel(
-  //     studentId: data['studentId'],
-  //     studentName: data['studentName'],
-  //     studentAcademicNumber: data['studentAcademicNumber'],
-  //     status: data['status'],
-  //     reason: data['reason'],
-  //     type: data['type'],
-  //     createdAt: (data['createdAt'] as Timestamp).toDate(),
-  //     fileURL: data['fileURL'] ?? "",
-  //     imageURL: data['imageURL'] ?? "",
-  //   );
-  // }
 }
