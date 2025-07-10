@@ -32,6 +32,7 @@ import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.d
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
 import 'package:student_absence/features/roles/supervisor/data/models/get_excuse_info_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -147,7 +148,24 @@ GoRouter createAppRouter(AuthCubit authCubit) {
             BlocProvider<StudentCubit>(create: (_) => StudentCubit()),
             BlocProvider<NavBarCubit>(create: (_) => NavBarCubit()),
           ],
-          child: StudentBottomNavBar(child: child),
+          child: Builder(
+            builder: (context) {
+              final userId = FirebaseAuth.instance.currentUser?.uid;
+              if (userId == null) {
+                return StudentBottomNavBar(child: child);
+              }
+              return StreamBuilder<int>(
+                stream: context.read<StudentCubit>().getUnreadNotificationsCount(userId),
+                builder: (context, snapshot) {
+                  final unreadCount = snapshot.data ?? 0;
+                  return StudentBottomNavBar(
+                    child: child,
+                    unreadNotificationsCount: unreadCount,
+                  );
+                },
+              );
+            },
+          ),
         ),
         routes: [
           GoRoute(
@@ -255,7 +273,24 @@ GoRouter createAppRouter(AuthCubit authCubit) {
             BlocProvider<SupervisorCubit>(create: (_) => SupervisorCubit()),
             BlocProvider<NavBarCubit>(create: (_) => NavBarCubit()),
           ],
-          child: SupervisorBottomNavBar(child: child),
+          child: Builder(
+            builder: (context) {
+              final userId = FirebaseAuth.instance.currentUser?.uid;
+              if (userId == null) {
+                return SupervisorBottomNavBar(child: child);
+              }
+              return StreamBuilder<int>(
+                stream: context.read<SupervisorCubit>().getUnreadNotificationsCount(userId),
+                builder: (context, snapshot) {
+                  final unreadCount = snapshot.data ?? 0;
+                  return SupervisorBottomNavBar(
+                    child: child,
+                    unreadNotificationsCount: unreadCount,
+                  );
+                },
+              );
+            },
+          ),
         ),
         routes: [
           GoRoute(
@@ -423,7 +458,24 @@ GoRouter createAppRouter(AuthCubit authCubit) {
             BlocProvider<ManagerCubit>(create: (_) => ManagerCubit()),
             BlocProvider<NavBarCubit>(create: (_) => NavBarCubit()),
           ],
-          child: ManagerBottomNavBar(child: child),
+          child: Builder(
+            builder: (context) {
+              final userId = FirebaseAuth.instance.currentUser?.uid;
+              if (userId == null) {
+                return ManagerBottomNavBar(child: child);
+              }
+              return StreamBuilder<int>(
+                stream: context.read<ManagerCubit>().getUnreadNotificationsCount(userId),
+                builder: (context, snapshot) {
+                  final unreadCount = snapshot.data ?? 0;
+                  return ManagerBottomNavBar(
+                    child: child,
+                    unreadNotificationsCount: unreadCount,
+                  );
+                },
+              );
+            },
+          ),
         ),
         routes: [
           GoRoute(

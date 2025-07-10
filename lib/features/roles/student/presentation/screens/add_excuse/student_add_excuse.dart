@@ -307,6 +307,7 @@ class _StudentAddExcusePageState extends State<StudentAddExcusePage> {
                           ),
                           const Expanded(
                             child: Text(
+                              textAlign: TextAlign.center,
                               'أتعهد بأن البيانات أعلاه صحيحة وجميع الملفات المُرفقة مُطابقة للأصل',
                               style: TextStyle(fontSize: 13),
                             ),
@@ -410,6 +411,7 @@ class _LabeledField extends StatelessWidget {
     );
   }
 }
+
 class _FileChip extends StatelessWidget {
   final String fileName;
   final Color color;

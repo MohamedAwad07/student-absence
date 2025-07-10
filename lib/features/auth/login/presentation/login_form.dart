@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:student_absence/core/routing/app_routes.dart';
+import 'package:student_absence/core/service%20locator/di.dart';
 import 'package:student_absence/core/widgets/custom_text_field.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/utils/app_strings.dart';
@@ -63,7 +64,7 @@ class _LoginFormState extends State<LoginForm> {
             const SizedBox(height: 8),
             const Text(
               AppStrings.loginSubtitle,
-              style: TextStyle(fontSize: 14, color: Colors.blueGrey),
+              style: TextStyle(fontSize: 12, color: Colors.blueGrey),
             ),
             const SizedBox(height: 32),
             Form(
@@ -120,6 +121,7 @@ class _LoginFormState extends State<LoginForm> {
                                   ),
                                 ),
                               );
+                              return;
                             } else {
                               context.read<AuthCubit>().login(
                                 role: widget.role,
@@ -143,7 +145,43 @@ class _LoginFormState extends State<LoginForm> {
                     ),
                     alignment: Alignment.center,
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                            final emailController = TextEditingController(
+                              text: _emailController.text,
+                            );
+                            final result = await showDialog<String>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('إعادة تعيين كلمة المرور'),
+                                content: TextField(
+                                  controller: emailController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'البريد الإلكتروني',
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: const Text('إلغاء'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () => Navigator.of(
+                                      context,
+                                    ).pop(emailController.text),
+                                    child: const Text('إرسال'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (result != null && result.isNotEmpty) {
+                              context.read<AuthCubit>().resetPassword(result);
+                              toastLocator.success(
+                                context,
+                                 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني (إن وجد).',
+                              );
+                            }
+                          },
                       child: const Text(
                         AppStrings.forgotPassword,
                         style: TextStyle(color: Colors.black, fontSize: 14),

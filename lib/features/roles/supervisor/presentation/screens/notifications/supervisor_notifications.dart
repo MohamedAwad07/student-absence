@@ -5,6 +5,8 @@ import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:student_absence/features/roles/supervisor/presentation/controller/supervisor_cubit/supervisor_cubit.dart';
 
 class SupervisorNotifications extends StatelessWidget {
   const SupervisorNotifications({super.key});
@@ -12,6 +14,10 @@ class SupervisorNotifications extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    // Mark all notifications as read when the page is opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<SupervisorCubit>().markAllNotificationsAsRead(currentUserId);
+    });
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(

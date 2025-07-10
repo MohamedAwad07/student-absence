@@ -32,7 +32,9 @@ class AuthController {
         'role': userModel.role,
         'academicNumber': userModel.academicNumber,
       });
-      return Left(AuthSuccess(userId: userId, message: 'User Created successfully'));
+      return Left(
+        AuthSuccess(userId: userId, message: 'User Created successfully'),
+      );
     } on FirebaseAuthException catch (e) {
       return Right(AuthFail(handleSignUpError(e)));
     }
@@ -59,7 +61,12 @@ class AuthController {
         password: password,
       );
 
-      return Left(AuthSuccess(userId: result.user!.uid, message:'User logged in successfully'));
+      return Left(
+        AuthSuccess(
+          userId: result.user!.uid,
+          message: 'User logged in successfully',
+        ),
+      );
     } on FirebaseAuthException catch (e) {
       log(e.toString());
       return Right(AuthFail(handleLoginError(e)));
@@ -111,28 +118,25 @@ class AuthController {
     }
   }
 
-  String handleLoginError(e) {
+  String handleLoginError(FirebaseAuthException e) {
     switch (e.code) {
       case 'invalid-email':
-        return 'Invalid email address format.';
-
+        return 'البريد الإلكتروني غير صالح';
       case 'user-disabled':
-        return 'User has been disabled.';
-
+        return 'تم تعطيل حساب المستخدم';
       case 'user-not-found':
-        return 'User not found.';
-
+        return 'لم يتم العثور على مستخدم بهذا البريد';
       case 'wrong-password':
-        return 'Incorrect password.';
-
+        return 'كلمة المرور غير صحيحة';
       case 'too-many-requests':
-        return 'Too many login attempts. Please try again later.';
-
+        return 'تمت محاولات تسجيل دخول كثيرة. حاول لاحقاً';
       case 'operation-not-allowed':
-        return 'Email/password sign-in is not enabled.';
-
+        return 'تسجيل الدخول عبر البريد غير مفعل';
+      case 'invalid-credential':
+        return 'خطأ في البريد الإلكتروني أو كلمة المرور';
+        {}
       default:
-        return 'An Error Happend While logging. Please Check your internet connection.';
+        return 'حدث خطأ: ${e.message}';
     }
   }
 

@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:student_absence/core/routing/app_router.dart';
+import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:student_absence/core/utils/app_extension.dart';
 import 'package:student_absence/core/utils/app_strings.dart';
 import 'package:student_absence/bloc_observer.dart';
@@ -53,7 +54,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         title: AppStrings.appName,
-        theme: ThemeData(useMaterial3: true, fontFamily: 'Cairo'),
+        theme: ThemeData(useMaterial3: true, fontFamily: 'Cairo',
+        scaffoldBackgroundColor: AppColors.scaffoldBackground,
+        ),
         locale: const Locale('ar'),
         supportedLocales: [const Locale('ar')],
         localizationsDelegates: [

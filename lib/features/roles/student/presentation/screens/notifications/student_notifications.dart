@@ -1,26 +1,43 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:student_absence/core/routing/app_routes.dart';
+import 'package:student_absence/core/utils/nav_bar_cubit.dart';
 import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
 
 class StudentNotifications extends StatelessWidget {
   const StudentNotifications({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Mark all notifications as read when the page is opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId != null) {
+        context.read<StudentCubit>().markAllNotificationsAsRead(userId);
+      }
+    });
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          BuildCustomAppBar(profileOnPressed: () {}),
+          BuildCustomAppBar(
+            profileOnPressed: () {
+              context.go(AppRoutes.studentProfilePage);
+              context.read<NavBarCubit>().setTab(4);
+            },
+          ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Filter and Title Row
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
                     child: Row(
@@ -48,25 +65,6 @@ class StudentNotifications extends StatelessWidget {
                     userId: FirebaseAuth.instance.currentUser!.uid,
                   ),
                   const SizedBox(height: 24),
-                  // Show More Button
-                  Center(
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.primary),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                      ),
-                      onPressed: () {},
-                      child: const Text(
-                        'عرض المزيد',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -93,14 +91,69 @@ class NotificationList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('notifications')
-          .where('userId', isEqualTo: userId)
-          .orderBy('createdAt', descending: true)
-          .snapshots(),
+      stream: context.read<StudentCubit>().getNotifications(userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Skeletonizer(
+            enabled: true,
+            child: Column(
+              children: List.generate(
+                4,
+                (index) => Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 12,
+                        height: 12,
+                        margin: const EdgeInsets.only(
+                          top: 36,
+                          left: 4,
+                          right: 8,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: Colors.grey,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      Expanded(
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          title: Container(
+                            width: double.infinity,
+                            height: 16,
+                            color: Colors.grey[300],
+                          ),
+                          subtitle: Container(
+                            width: double.infinity,
+                            height: 12,
+                            margin: const EdgeInsets.only(top: 6),
+                            color: Colors.grey[200],
+                          ),
+                          trailing: Container(
+                            width: 40,
+                            height: 12,
+                            color: Colors.grey[200],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return const Center(child: Text('لا توجد إشعارات حالياً'));
@@ -129,8 +182,10 @@ class NotificationList extends StatelessWidget {
                     width: 12,
                     height: 12,
                     margin: const EdgeInsets.only(top: 36, left: 4, right: 8),
-                    decoration: const BoxDecoration(
-                      color: AppColors.secondary,
+                    decoration: BoxDecoration(
+                      color: data['isRead'] == true
+                          ? AppColors.primary
+                          : AppColors.secondary,
                       shape: BoxShape.circle,
                     ),
                   ),

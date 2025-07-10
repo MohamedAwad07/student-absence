@@ -10,15 +10,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:student_absence/core/utils/nav_bar_cubit.dart';
 
 class StudentBottomNavBar extends StatelessWidget {
-  const StudentBottomNavBar({super.key, required this.child});
+  const StudentBottomNavBar({
+    super.key,
+    required this.child,
+    this.unreadNotificationsCount,
+  });
   final Widget child;
+  final int? unreadNotificationsCount;
+
   @override
   Widget build(BuildContext context) {
     final List<TabItem> items = [
       const TabItem(icon: Icons.home_outlined),
       const TabItem(icon: Icons.file_open_outlined),
       const TabItem(icon: Icons.add_box),
-      const TabItem(icon: Icons.notification_important_outlined),
+      TabItem(
+        icon: Icons.notification_important_outlined,
+        count: (unreadNotificationsCount ?? 0) > 0
+            ? const Icon(Icons.circle, size: 10, color: Colors.red)
+            : null,
+      ),
       const TabItem(icon: Icons.person_2_outlined),
     ];
 

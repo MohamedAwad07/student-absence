@@ -5,7 +5,12 @@ import 'package:student_absence/core/utils/app_strings.dart';
 
 class BuildCustomAppBar extends StatelessWidget {
   final VoidCallback profileOnPressed;
-  const BuildCustomAppBar({super.key, required this.profileOnPressed});
+  final bool fromProfile;
+  const BuildCustomAppBar({
+    super.key,
+    required this.profileOnPressed,
+    this.fromProfile = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +40,17 @@ class BuildCustomAppBar extends StatelessWidget {
               ),
             ],
           ),
-          IconButton(
-            padding: EdgeInsets.zero,
-            icon: const Icon(
-              Icons.account_circle,
-              color: Colors.white,
-              size: 38,
-            ),
-            onPressed: profileOnPressed,
-          ),
+          fromProfile == true
+              ? const SizedBox.shrink()
+              : IconButton(
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(
+                    Icons.account_circle,
+                    color: Colors.white,
+                    size: 38,
+                  ),
+                  onPressed: profileOnPressed,
+                ),
         ],
       ),
     );

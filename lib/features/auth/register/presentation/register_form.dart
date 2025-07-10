@@ -88,7 +88,11 @@ class RegisterFormState extends State<RegisterForm> {
           children: [
             const Text(
               AppStrings.register,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
             ),
             const SizedBox(height: 8),
             CustomTextField(
@@ -173,7 +177,9 @@ class RegisterFormState extends State<RegisterForm> {
             BlocBuilder<AuthCubit, AuthState>(
               builder: (context, state) {
                 if (state is AuthLoading) {
-                  return const CircularProgressIndicator();
+                  return const CircularProgressIndicator(
+                    color: AppColors.primary,
+                  );
                 }
                 return CustomButton(
                   label: AppStrings.registerButton,

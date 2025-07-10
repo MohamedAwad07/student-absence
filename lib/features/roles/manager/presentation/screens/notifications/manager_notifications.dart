@@ -3,6 +3,8 @@ import 'package:student_absence/core/widgets/app_bar.dart';
 import 'package:student_absence/core/utils/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:student_absence/features/roles/manager/presentation/controller/manager_cubit/manager_cubit.dart';
 
 class ManagerNotificationsPage extends StatelessWidget {
   const ManagerNotificationsPage({super.key});
@@ -10,6 +12,10 @@ class ManagerNotificationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    // Mark all notifications as read when the page is opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ManagerCubit>().markAllNotificationsAsRead(currentUserId);
+    });
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
@@ -107,8 +113,10 @@ class NotificationList extends StatelessWidget {
                         width: 12,
                         height: 12,
                         margin: const EdgeInsetsDirectional.only(start: 4),
-                        decoration: const BoxDecoration(
-                          color: AppColors.secondary,
+                        decoration: BoxDecoration(
+                          color: data['isRead'] == true
+                              ? AppColors.primary
+                              : AppColors.secondary,
                           shape: BoxShape.circle,
                         ),
                       ),

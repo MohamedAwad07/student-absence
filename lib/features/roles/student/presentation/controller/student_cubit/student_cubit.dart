@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -73,5 +74,35 @@ class StudentCubit extends Cubit<StudentState> {
       (failure) => log('❌ Failed to submit excuse: ${failure.message}'),
       (message) => log('✅ Success: $message'),
     );
+  }
+
+  Stream<QuerySnapshot<Object?>>? getNotifications(String userId) {
+    return FirebaseFirestore.instance
+        .collection('notifications')
+        .where('userId', isEqualTo: userId)
+        .orderBy('createdAt', descending: true)
+        .snapshots();
+  }
+
+  Stream<int> getUnreadNotificationsCount(String userId) {
+  return FirebaseFirestore.instance
+      .collection('notifications')
+      .where('userId', isEqualTo: userId)
+      .where('isRead', isEqualTo: false)
+      .snapshots()
+      .map((snapshot) => snapshot.docs.length);
+}
+
+  Future<void> markAllNotificationsAsRead(String userId) async {
+    final batch = FirebaseFirestore.instance.batch();
+    final query = await FirebaseFirestore.instance
+        .collection('notifications')
+        .where('userId', isEqualTo: userId)
+        .where('isRead', isEqualTo: false)
+        .get();
+    for (var doc in query.docs) {
+      batch.update(doc.reference, {'isRead': true});
+    }
+    await batch.commit();
   }
 }

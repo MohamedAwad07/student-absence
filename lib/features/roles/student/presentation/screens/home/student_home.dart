@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:student_absence/features/auth/controller/auth_cubit/auth_cubit.dart';
 import 'package:student_absence/features/roles/student/presentation/controller/student_cubit/student_cubit.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StudentHomePage extends StatefulWidget {
   const StudentHomePage({super.key});
@@ -52,7 +53,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
                     children: [
                       const CircleAvatar(
                         radius: 36,
-                        backgroundColor: Color(0xFFD4A63A),
+                        backgroundColor: AppColors.secondary,
                         child: Icon(
                           Icons.person,
                           size: 48,
@@ -360,28 +361,74 @@ Color _statusColor(String status) {
 }
 
 class _NotificationList extends StatelessWidget {
-  final List<Map<String, String>> notifications = const [
-    {'text': 'تم قبول عذرك الطبي', 'date': '2023-04-16'},
-    {'text': 'تم رفض عذر غياب محاضرة الشبكات', 'date': '2023-04-12'},
-    {'text': 'تم تحديث حالة عذر غياب محاضرة البرمجة', 'date': '2023-04-11'},
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: notifications.map((notif) {
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          child: ListTile(
-            leading: const Icon(Icons.notifications, color: Color(0xFF225A2A)),
-            title: Text(
-              notif['text']!,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      return const SizedBox.shrink();
+    }
+    return StreamBuilder<QuerySnapshot>(
+      stream: context.read<StudentCubit>().getNotifications(userId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Skeletonizer(
+            enabled: true,
+            child: Column(
+              children: List.generate(
+                3,
+                (index) => Card(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.notifications,
+                      color: AppColors.secondary,
+                    ),
+                    title: Container(
+                      width: 80,
+                      height: 12,
+                      color: Colors.grey[300],
+                    ),
+                    subtitle: Container(
+                      width: 60,
+                      height: 10,
+                      color: Colors.grey[200],
+                    ),
+                  ),
+                ),
+              ),
             ),
-            subtitle: Text('بتاريخ: ${notif['date']}'),
-          ),
+          );
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text('لا توجد إشعارات بعد'));
+        }
+        final notifications = snapshot.data!.docs.take(3).toList();
+        return Column(
+          children: notifications.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              child: ListTile(
+                leading: const Icon(
+                  Icons.notifications,
+                  color: AppColors.secondary,
+                ),
+                title: Text(
+                  data['title'] ?? '',
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  data['createdAt'] != null
+                      ? 'بتاريخ: ${(data['createdAt'] as Timestamp).toDate().toString().split(' ').first}'
+                      : '',
+                ),
+              ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 }

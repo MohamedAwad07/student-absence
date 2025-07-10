@@ -32,7 +32,7 @@ class _CustomProfilePageState extends State<CustomProfilePage> {
         backgroundColor: AppColors.scaffoldBackground,
         body: CustomScrollView(
           slivers: [
-            BuildCustomAppBar(profileOnPressed: () {}),
+            BuildCustomAppBar(profileOnPressed: () {},  fromProfile: true,),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
